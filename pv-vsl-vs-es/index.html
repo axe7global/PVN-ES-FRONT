@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página</title>
+  
+	<link rel="preload" href="https://scripts.converteai.net/7ee76c7b-b701-481f-b973-2b478faae041/ab-test/67fff63e7da91b4857d0a0ea/player.js" as="script">
+	<link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer/v1/smartplayer.min.js" as="script">
+	<link rel="dns-prefetch" href="https://cdn.converteai.net">
+	<link rel="dns-prefetch" href="https://scripts.converteai.net">
+	<link rel="dns-prefetch" href="https://images.converteai.net">
+	<link rel="dns-prefetch" href="https://api.vturb.com.br">
+	
+	<script
+	  src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+	  data-utmify-prevent-subids
+	  async
+	  defer
+	></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <script>
+      function getCurrentDate() {
+          const today = new Date();
+          const day = String(today.getDate()).padStart(2, '0');
+          const month = String(today.getMonth() + 1).padStart(2, '0');
+          const year = today.getFullYear();
+          // Formato español: dd/mm/aaaa
+          return `${day}/${month}/${year}`;
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+          document.getElementById('dynamic-date').textContent = getCurrentDate();
+      });
+  </script>
+  <style>
+      body {
+          font-family: 'Poppins', sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #fff;
+      }
+
+      .top-bar {
+          background-color: #3366FF;
+          color: white;
+          text-align: center;
+          padding: 10px;
+      }
+
+      .video-section {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
+      }
+
+      .sound-notice {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 20px;
+          font-size: 16px;
+          margin-bottom: 40px;
+      }
+      .sound-notice i {
+          margin-right: 10px;
+      }
+
+      .comments-container {
+          max-width: 800px;
+          margin: 30px auto;
+          background-color: #EBEBEB;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .comments-header {
+          font-size: 14px;
+          color: #6C757D;
+          text-align: left;
+          margin-bottom: 20px;
+      }
+
+      .comment {
+          display: flex;
+          align-items: flex-start;
+          padding: 15px 0;
+          border-bottom: 1px solid #BFBFBF;
+      }
+
+      .comment:last-child {
+          border-bottom: none;
+      }
+
+      .comment img {
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          margin-right: 15px;
+      }
+
+      .comment-content {
+          flex: 1;
+      }
+
+      .comment-header {
+          font-weight: 600;
+          font-size: 14px;
+          color: #3A559F;
+          margin-bottom: 5px;
+      }
+
+      .comment-text {
+          font-size: 14px;
+          color: #636669;
+          margin-bottom: 10px;
+      }
+
+      .nested-comments {
+          border-left: 2px solid #BFBFBF;
+          padding-left: 10px;
+      }
+      
+      .loading-icon {
+          animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+          from {
+              transform: rotate(0deg);
+          }
+          to {
+              transform: rotate(360deg);
+          }
+      }
+      
+      .load-more-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 20px;
+          padding: 20px;
+      }
+
+      #loadMoreBtn {
+          background-color: #3A559F;
+          color: white;
+          font-weight: 600;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 14px;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;
+      }
+
+      #loadMoreBtn:hover {
+          background-color: #2d4373;
+      }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+      Esta presentación solo estará disponible hasta el <span id="dynamic-date" class="underline-highlight"></span>
+  </div>
+
+  <div class="video-section">
+      <script type="text/javascript" id="scr_67fff63e7da91b4857d0a0ea"> var s=document.createElement("script"); s.src="https://scripts.converteai.net/7ee76c7b-b701-481f-b973-2b478faae041/ab-test/67fff63e7da91b4857d0a0ea/player.js", s.async=!0,document.head.appendChild(s); </script>
+  </div>
+
+  <div class="sound-notice">
+      <i class="bi bi-volume-up-fill"></i>
+      Asegúrese de que el sonido esté activado
+  </div>
+
+  <div class="comments-container">
+      <div class="comments-header">12 de 1143 comentarios</div>
+      
+      <div class="comment">
+          <img src="images/user1.jpg" alt="Wanpen Beckwith">
+          <div class="comment-content">
+              <div class="comment-header">Wanpen Beckwith</div>
+              <div class="comment-text">¡Nunca he estado tan feliz de ver un video de principio a fin! GRACIAS...</div>
+          </div>
+      </div>
+      
+      <div class="comment">
+          <img src="images/user2.jpg" alt="Vilma Bawkin">
+          <div class="comment-content">
+              <div class="comment-header">Vilma Bawkin</div>
+              <div class="comment-text">Mi papá no podía ni leer los carteles en la calle… ¡y ahora lee el periódico todos los días sin gafas, después de casi 10 años! Todo gracias a esa receta del video. Todavía no me lo creo… estoy en shock.</div>
+          </div>
+      </div>
+      
+      <div class="comment">
+          <img src="images/user3.jpg" alt="Teresa King">
+          <div class="comment-content">
+              <div class="comment-header">Teresa King</div>
+              <div class="comment-text">Siento mucho ardor y visión borrosa desde hace años… ¿alguien más aquí ya probó este protocolo?</div>
+              <div class="nested-comments">
+                  <div class="comment">
+                      <img src="images/user4.jpg" alt="Scott Melvin">
+                      <div class="comment-content">
+                          <div class="comment-header">Scott Melvin</div>
+                          <div class="comment-text">¡Funciona de verdad! En 15 días mi vista ya estaba muchísimo más nítida.</div>
+                      </div>
+                  </div>
+                  <div class="comment">
+                      <img src="images/user5.jpg" alt="Lisa Miller">
+                      <div class="comment-content">
+                          <div class="comment-header">Lisa Miller</div>
+                          <div class="comment-text">¡Lo confirmo! Mi mamá tenía cataratas y ya había perdido las esperanzas… pero esta receta fue lo que realmente marcó la diferencia.</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <div class="comment">
+          <img src="images/user6.jpg" alt="Lori Marie">
+          <div class="comment-content">
+              <div class="comment-header">Lori Marie</div>
+              <div class="comment-text">Mis molestias en los ojos disminuyeron mucho, y esas manchas negras que veía todo el tiempo desaparecieron. ¡Veo mucho mejor ahora!</div>
+          </div>
+      </div>
+      
+      <div class="comment">
+          <img src="images/user7.jpg" alt="Amanda O'Malley">
+          <div class="comment-content">
+              <div class="comment-header">Amanda O'Malley</div>
+              <div class="comment-text">Siempre pensé que recuperar la vista sin cirugía era imposible… Pero ver tantos testimonios aquí me devolvió la esperanza.</div>
+          </div>
+      </div>
+      
+      <div class="comment">
+          <img src="images/user8.jpg" alt="Andy Battoglia">
+          <div class="comment-content">
+              <div class="comment-header">Andy Battoglia</div>
+              <div class="comment-text">Sinceramente... suena demasiado bueno para ser verdad. Tengo miedo de perder el tiempo y que no funcione.</div>
+              <div class="nested-comments">
+                  <div class="comment">
+                      <img src="images/user9.jpg" alt="Lucy Delane">
+                      <div class="comment-content">
+                          <div class="comment-header">Lucy Delane</div>
+                          <div class="comment-text">Pensé lo mismo, pero decidí probar. En menos de 3 semanas, mi vista pasó de borrosa a clara — estoy maravillada.</div>
+                      </div>
+                  </div>
+                  <div class="comment">
+                      <img src="images/user8.jpg" alt="Andy Battoglia">
+                      <div class="comment-content">
+                          <div class="comment-header">Andy Battoglia</div>
+                          <div class="comment-text">Muchas gracias por tu comentario, entonces también lo voy a intentar.</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <div class="comment">
+          <img src="images/user10.jpg" alt="Melony Scharmen">
+          <div class="comment-content">
+              <div class="comment-header">Melony Scharmen</div>
+              <div class="comment-text">Estoy tan emocionada… usé gafas desde los 16 años y ahora, después de 30 días con esta receta, ¡por fin pude manejar de noche sin miedo!</div>
+          </div>
+      </div>
+
+      <div class="comment">
+          <img src="images/user11.jpg" alt="Stefanie Spear">
+          <div class="comment-content">
+              <div class="comment-header">Stefanie Spear</div>
+              <div class="comment-text">@joycelima amiga, ¡es ese truco con espirulina del que te hablé! De verdad me ayudó, ahora todo se ve mucho más claro.</div>
+          </div>
+      </div>
+      
+      <div class="load-more-container">
+          <button id="loadMoreBtn">
+              Mostrar más comentarios
+          </button>
+      </div>
+
+  </div>
+  
+  <script>
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      loadMoreBtn.addEventListener('click', () => {
+          loadMoreBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="margin-right: 8px;"></i>Cargando...';
+      });
+  </script>
+</body>
+</html>
