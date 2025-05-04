@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Etapa 1</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f9f9f9;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    }
+    .top-menu {
+      background-color: red;
+      padding: 5px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9em;
+      color: white;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .page-wrapper {
+      padding: 10px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+    .highlight {
+      color: green;
+      font-weight: bold;
+    }
+    .section {
+      padding: 5px;
+    }
+    ul {
+      list-style-type: "✅ ";
+      padding-left: 20px;
+    }
+    .emoji {
+      font-size: 1.2em;
+    }
+    .center {
+      text-align: center;
+    }
+
+    /* === NOVO: wrapper e overlay para a Hotmart === */
+    .hotmart-wrapper {
+      position: relative;       /* torna este contêiner a referência para o overlay */
+      display: inline-block;    /* ajusta à largura do widget */
+      margin: 30px 0;           /* espaço acima/abaixo */
+    }
+    .overlay-hide-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      /* Ajuste este valor para a altura exata do seu botão Hotmart */
+      bottom: 280px;             
+      background: white;
+      z-index: 9999;
+      pointer-events: none;     /* cliques “atravessam” o overlay */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-menu">
+    ETAPA 1 DE 2
+  </div>
+
+  <div class="page-wrapper">
+    <div class="section">
+      <p>Hola, aquí el Dra. Sofía Martínez nuevamente...</p>
+      <p><strong class="highlight">Quiero felicitarte</strong> por asegurar el acceso al <strong>Mounjaro Japonés Casero</strong>.</p>
+      <p>Sin duda, fue una de las decisiones más importantes de tu vida — y no puedo esperar para escuchar tu testimonio pronto.</p>
+      <p>Ahora queremos mostrarte cómo acceder a la aplicación para que puedas empezar a seguir el protocolo.</p>
+      <p>A continuación, verás un botón...</p>
+      <p>Haz clic en él para ir a nuestra página con las instrucciones.</p>
+    </div>
+
+    <!-- envelopa o widget e o overlay -->
+    <div class="hotmart-wrapper center">
+      <!-- overlay que esconde tudo acima do botão -->
+      <div class="overlay-hide-top"></div>
+
+      <!-- HOTMART - Sales Funnel Widget -->
+      <div id="hotmart-sales-funnel"></div>
+      <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
+      <script>
+        checkoutElements
+          .init('salesFunnel')
+          .mount('#hotmart-sales-funnel');
+      </script>
+      <!-- FIM HOTMART -->
+    </div>
+
+    <div class="section">
+      <p>Nos vemos del otro lado,<br>Dra. Sofía Martínez</p>
+    </div>
+  </div>
+  
+</body>
+</html>
