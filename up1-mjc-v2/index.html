@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Processamento de Pagamento</title>
+  <title>Up1</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,43 +49,36 @@
       transition-duration: 300ms;
     }
     .hotmart-wrapper {
-      position: relative;       /* torna este contêiner a referência para o overlay */
-      display: inline-block;    /* ajusta à largura do widget */
-      margin: 30px 0;           /* espaço acima/abaixo */
+      position: relative;
+      display: inline-block;
+      margin: 30px 0;
     }
     .overlay-hide-top {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      /* Ajuste este valor para a altura exata do seu botão Hotmart */
-      bottom: 280px;             
+      bottom: 280px;
       background: white;
       z-index: 9999;
-      pointer-events: none;     /* cliques “atravessam” o overlay */
+      pointer-events: none;
     }
   </style>
 </head>
 <body class="bg-gray-100">
-  <!-- Container: vertical start on mobile, center on larger screens, allow scrolling -->
   <div class="min-h-screen flex items-start sm:items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-lg">
-      <!-- Payment Screen Card -->
       <div class="w-full max-w-md mx-auto p-6 rounded-lg shadow-lg bg-white">
-        <!-- Warning Header -->
         <div class="bg-red-600 text-white font-bold py-3 px-4 rounded-t-lg text-center mb-6">
-          <h1 class="text-lg">ATENÇÃO: Não feche nem atualize a página!</h1>
+          <h1 class="text-lg">ATENCIÓN: ¡No cierres ni actualices la página!</h1>
         </div>
-        <!-- Content -->
         <div class="transition-all duration-500 ease-in-out">
-          <!-- Loading State -->
           <div id="spinner-screen" class="flex flex-col items-center justify-center space-y-6 py-8">
             <div class="flex justify-center items-center">
               <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
             </div>
-            <p class="text-gray-700 text-xl font-medium">Processando pagamento...</p>
+            <p class="text-gray-700 text-xl font-medium">Procesando el pago...</p>
           </div>
-          <!-- Error State -->
           <div id="error-screen" class="hidden flex flex-col items-center justify-center space-y-6 py-8 animate-fade-in">
             <div class="rounded-full bg-red-100 p-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,29 +86,24 @@
               </svg>
             </div>
             <div class="text-center">
-              <h2 class="text-2xl font-bold text-gray-800 mb-2">Erro no Pagamento</h2>
-              <p class="text-gray-600 mb-6">Não foi possível processar seu pagamento. Por favor, tente novamente.</p>
+              <h2 class="text-2xl font-bold text-gray-800 mb-2">Error en el pago</h2>
+              <p class="text-gray-600 mb-6">No se pudo procesar tu pago. Por favor, inténtalo de nuevo.</p>
             </div>
-			<!-- envelopa o widget e o overlay -->
-			<div class="hotmart-wrapper center">
-			  <!-- overlay que esconde tudo acima do botão -->
-			  <div class="overlay-hide-top"></div>
-
-			  <!-- HOTMART - Sales Funnel Widget -->
-			  <div id="hotmart-sales-funnel"></div>
-			  <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
-			  <script>
-				checkoutElements
-				  .init('salesFunnel')
-				  .mount('#hotmart-sales-funnel');
-			  </script>
-			  <!-- FIM HOTMART -->
-			</div>
+            <div class="hotmart-wrapper center">
+              <div class="overlay-hide-top"></div>
+              <div id="hotmart-sales-funnel"></div>
+              <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
+              <script>
+                checkoutElements
+                  .init('salesFunnel')
+                  .mount('#hotmart-sales-funnel');
+              </script>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Script to toggle states and initialize Hotmart -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       setTimeout(function () {
