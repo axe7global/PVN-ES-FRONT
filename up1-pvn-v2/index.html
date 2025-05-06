@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Up1</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Hotmart Checkout Elements -->
+  <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
+  <!-- Tailwind CSS (with custom config) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#14B8A6',
+            accent: '#F97316',
+            success: '#10B981',
+            warning: '#F59E0B',
+            error: '#EF4444',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .transition-all {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 300ms;
+    }
+    .hotmart-wrapper {
+      position: relative;
+      display: inline-block;
+      margin: 30px 0;
+    }
+    .overlay-hide-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 280px;
+      background: white;
+      z-index: 9999;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div class="min-h-screen flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-lg">
+      <div class="w-full max-w-md mx-auto p-6 rounded-lg shadow-lg bg-white">
+        <div class="bg-red-600 text-white font-bold py-3 px-4 rounded-t-lg text-center mb-6">
+          <h1 class="text-lg">ATENCIÓN: ¡No cierres ni actualices la página!</h1>
+        </div>
+        <div class="transition-all duration-500 ease-in-out">
+          <div id="spinner-screen" class="flex flex-col items-center justify-center space-y-6 py-8">
+            <div class="flex justify-center items-center">
+              <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            </div>
+            <p class="text-gray-700 text-xl font-medium">Procesando el pago...</p>
+          </div>
+          <div id="error-screen" class="hidden flex flex-col items-center justify-center space-y-6 py-8 animate-fade-in">
+            <div class="rounded-full bg-red-100 p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <div class="text-center">
+              <h2 class="text-2xl font-bold text-gray-800 mb-2">Error en el pago</h2>
+              <p class="text-gray-600 mb-6">No se pudo procesar tu pago. Por favor, inténtalo de nuevo.</p>
+            </div>
+            <div class="hotmart-wrapper center">
+              <div class="overlay-hide-top"></div>
+              <div id="hotmart-sales-funnel"></div>
+              <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
+              <script>
+                checkoutElements
+                  .init('salesFunnel')
+                  .mount('#hotmart-sales-funnel');
+              </script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        document.getElementById('spinner-screen').classList.add('hidden');
+        document.getElementById('error-screen').classList.remove('hidden');
+        if (typeof window.checkoutElements !== 'undefined') {
+          window.checkoutElements
+            .init('salesFunnel')
+            .mount('#hotmart-sales-funnel');
+        }
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
