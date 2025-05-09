@@ -6,13 +6,13 @@
 
   <title>Up2</title>
   
-	<script type="text/javascript">
-		(function(c,l,a,r,i,t,y){
-			c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-			t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-			y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-		})(window, document, "clarity", "script", "rfakttjqj4");
-	</script>
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "rfakttjqj4");
+  </script>
 
   <style>
     body {
@@ -61,30 +61,28 @@
       text-align: center;
     }
 
-    /* === NOVO: wrapper e overlay para a Hotmart === */
     .hotmart-wrapper {
-      position: relative;       /* torna este contêiner a referência para o overlay */
-      display: inline-block;    /* ajusta à largura do widget */
-      margin: 30px 0;           /* espaço acima/abaixo */
+      position: relative;
+      display: inline-block;
+      margin: 30px 0;
     }
     .overlay-hide-top {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      /* Ajuste este valor para a altura exata do seu botão Hotmart */
-      bottom: 280px;             
+      bottom: 280px;
       background: white;
       z-index: 9999;
-      pointer-events: none;     /* cliques “atravessam” o overlay */
+      pointer-events: none;
     }
-	p {
-	  margin-bottom: 1.8em; /* ou experimente com 1.5em, 2em etc. */
-	}
-	.warning {
-	  color: red;
-	  font-weight: bold;
-	}
+    p {
+      margin-bottom: 1.8em;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -95,29 +93,26 @@
 
   <div class="page-wrapper">
     <div class="section">
-      <p class="center"><span class="warning">ATENÇÃO!</span></p>
-	  <p>Não atualize nem feche essa página, essa etapa é fundamental!</p>
-      <p>Vou te dar as instruções de como acessar o aplicativo...</p>
-      <p>Ao acessar o link do aplicativo você verá uma tela como essa...</p>
-	  <div class="center">
-		<img src="img/img1-up2.png" alt="Imagem 1" style="max-width: 100%; height: auto;">
-	  </div>
-      <p>Nessa etapa, basta digitar o e-mail que você usou na compra e clicar no botão para entrar.</p>
-      <p>Depois de fazer login, verá uma tela como esta:</p>
-	  <div class="center">
-		<img src="img/img2-up2.png" alt="Imagem 2" style="max-width: 100%; height: auto;">
-	  </div>
-      <p>A partir daqui, é só seguir o protocolo passo a passo, exatamente como indicado dentro da plataforma.</p>
-	  <p>Aqui abaixo você verá um novo botão...</p>
-	  <p>Clique nele para receber o link de acesso ao protocolo.</p>
+      <p class="center"><span class="warning">¡ATENCIÓN!</span></p>
+      <p>No actualices ni cierres esta página, ¡esta etapa es fundamental!</p>
+      <p>Te daré las instrucciones para acceder a la aplicación...</p>
+      <p>Al acceder al enlace de la aplicación, verás una pantalla como esta...</p>
+      <div class="center">
+        <img src="img/img1-up2.png" alt="Imagen 1" style="max-width: 100%; height: auto;">
+      </div>
+      <p>En esta etapa, solo tienes que ingresar el correo electrónico que usaste en la compra y hacer clic en el botón para ingresar.</p>
+      <p>Después de iniciar sesión, verás una pantalla como esta:</p>
+      <div class="center">
+        <img src="img/img2-up2.png" alt="Imagen 2" style="max-width: 100%; height: auto;">
+      </div>
+      <p>A partir de aquí, solo sigue el protocolo paso a paso, exactamente como se indica dentro de la plataforma.</p>
+      <p>A continuación verás un nuevo botón...</p>
+      <p>Haz clic en él para recibir el enlace de acceso al protocolo.</p>
     </div>
 
-    <!-- envelopa o widget e o overlay -->
     <div class="hotmart-wrapper center">
-      <!-- overlay que esconde tudo acima do botão -->
       <div class="overlay-hide-top"></div>
 
-      <!-- HOTMART - Sales Funnel Widget -->
       <div id="hotmart-sales-funnel"></div>
       <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
       <script>
@@ -125,7 +120,6 @@
           .init('salesFunnel')
           .mount('#hotmart-sales-funnel');
       </script>
-      <!-- FIM HOTMART -->
     </div>
 
     <div class="section">
