@@ -3,17 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <title>Up1</title>
   
-                <script
-                src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js">
-                </script>
-
-                <script>
-                new OcuExternal();
-                </script>
-            
+  <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
+  <script>
+    new OcuExternal();
+  </script>
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -78,7 +74,10 @@
       <p>Haz clic en él para ir a nuestra página con las instrucciones.</p>
 
       <div class="center">
-        <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=yes" target="_blank" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; font-weight: bold; border-radius: 5px;">
+        <a id="autoClickBtn"
+           href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=yes"
+           target="_blank"
+           style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; font-weight: bold; border-radius: 5px;">
           Ir a las instrucciones
         </a>
       </div>
@@ -89,5 +88,17 @@
     </div>
   </div>
 
+  <!-- Script para auto-clique após 25 segundos -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      // espera 25 segundos (25 000 ms)
+      setTimeout(function() {
+        var link = document.querySelector('a[href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=yes"]');
+        if (link) {
+          link.click();
+        }
+      }, 25000);
+    });
+  </script>
 </body>
 </html>
