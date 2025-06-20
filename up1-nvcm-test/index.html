@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Up1</title>
 
-  <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
-  <script>
-    new OcuExternal();
-  </script>
+  <title>Up1</title>
   
+                <script
+                src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js">
+                </script>
+
+                <script>
+                new OcuExternal();
+                </script>
+            
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,6 +36,13 @@
     .page-wrapper {
       padding: 10px;
     }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
     .highlight {
       color: green;
       font-weight: bold;
@@ -39,18 +50,15 @@
     .section {
       padding: 5px;
     }
+    ul {
+      list-style-type: "✅ ";
+      padding-left: 20px;
+    }
+    .emoji {
+      font-size: 1.2em;
+    }
     .center {
       text-align: center;
-    }
-    a.button {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 5px;
     }
   </style>
 </head>
@@ -62,7 +70,7 @@
 
   <div class="page-wrapper">
     <div class="section">
-      <p>Hola, aquí la Dra. Sofía Martínez nuevamente...</p>
+      <p>Hola, aquí el Dra. Sofía Martínez nuevamente...</p>
       <p><strong class="highlight">Quiero felicitarte</strong> por asegurar el acceso al <strong>Mounjaro Japonés Casero</strong>.</p>
       <p>Sin duda, fue una de las decisiones más importantes de tu vida — y no puedo esperar para escuchar tu testimonio pronto.</p>
       <p>Ahora queremos mostrarte cómo acceder a la aplicación para que puedas empezar a seguir el protocolo.</p>
@@ -70,10 +78,7 @@
       <p>Haz clic en él para ir a nuestra página con las instrucciones.</p>
 
       <div class="center">
-        <a id="autoClickBtn"
-           class="button"
-           href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVVPG?accepted=yes"
-           target="_blank">
+        <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/ZyVpl4dVPG?accepted=yes" target="_blank" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; font-weight: bold; border-radius: 5px;">
           Ir a las instrucciones
         </a>
       </div>
@@ -90,40 +95,5 @@
     </div>
   </div>
 
-  <script>
-    window.addEventListener('DOMContentLoaded', function() {
-      // Após 25 segundos, dispara o clique no link
-      setTimeout(function() {
-        var link = document.getElementById('autoClickBtn');
-        if (!link) return;
-        link.click();
-
-        // Observa o DOM para detectar quando o modal é inserido
-        var observer = new MutationObserver(function(mutations, obs) {
-          var confirmBtn = document.getElementById('cartpanda-payment-confirmation');
-          if (confirmBtn) {
-            // Clica imediatamente no botão de confirmar pagamento
-            confirmBtn.click();
-            obs.disconnect();
-          }
-        });
-
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true
-        });
-
-        // Em caso de carregamento lento do modal, tenta forçar envio após 3s
-        setTimeout(function() {
-          var form = document.getElementById('cartpanda-payment-form');
-          if (form && !form.hasAttribute('data-submitted')) {
-            form.setAttribute('data-submitted', 'true');
-            form.submit();
-          }
-        }, 3000);
-
-      }, 25000);
-    });
-  </script>
 </body>
 </html>
