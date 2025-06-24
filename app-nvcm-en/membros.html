@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NerveCalm - Member Area</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <h1>NerveCalm</h1>
+    </header>
+
+    <div class="container">
+        <div class="modules-grid" id="modulesGrid">
+            <!-- Modules will be inserted here via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const modulos = [
+            {
+                nome: "Recipe",
+                tipo: "Ebook", 
+                imagem: "img/principal.png", 
+                src: "https://natural-home-remedy-for--kt141sj.gamma.site/"
+            },
+            {
+                nome: "Bonus 1",
+                tipo: "Ebook",
+                imagem: "img/bonus1.png", 
+                src: "https://7-daily-habits-to-natura-in5t897.gamma.site/"
+            },
+            {
+                nome: "Bonus 2",
+                tipo: "Ebook",
+                imagem: "img/bonus2.png", 
+                src: "https://neuropathy-pain-wellness-bhbo47g.gamma.site/"
+            },
+            {
+                nome: "Bonus 3",
+                tipo: "Ebook",
+                imagem: "img/bonus3.png", 
+                src: "https://guided-relaxation-for-ne-buxo563.gamma.site/"
+            }
+        ];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const modulesGrid = document.getElementById("modulesGrid");
+            if (modulesGrid) {
+                modulos.forEach(modulo => {
+                    const moduleCard = document.createElement("div");
+                    moduleCard.classList.add("module-card");
+
+                    let link = "modulo.html";
+                    let params = `name=${encodeURIComponent(modulo.nome)}`;
+
+                    if (modulo.tipo === "Ebook") {
+                        params += `&type=ebook&src=${encodeURIComponent(modulo.src)}`;
+                    } else if (modulo.tipo === "Vídeo Aulas") {
+                        params += `&type=video&videos=${encodeURIComponent(JSON.stringify(modulo.videos))}`;
+                    }
+
+                    moduleCard.innerHTML = `
+                        <div class="module-image-container">
+                            <img src="${modulo.imagem || "img/placeholder.svg"}" alt="${modulo.nome}">
+                        </div>
+                        <h3>${modulo.nome}</h3>
+                        <a href="${link}?${params}" class="btn-access">Access Content</a>
+                    `;
+                    modulesGrid.appendChild(moduleCard);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
