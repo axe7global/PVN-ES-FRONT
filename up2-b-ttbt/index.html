@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processamento de Pagamento</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS (with custom config) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#14B8A6',
+            accent: '#F97316',
+            success: '#10B981',
+            warning: '#F59E0B',
+            error: '#EF4444',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .transition-all {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 300ms;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Container -->
+  <div class="min-h-screen flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-lg">
+      <!-- Payment Screen Card -->
+      <div class="w-full max-w-md mx-auto p-6 rounded-lg shadow-lg bg-white">
+        <!-- Warning Header -->
+        <div class="bg-red-600 text-white font-bold py-3 px-4 rounded-t-lg text-center mb-6">
+          <h1 class="text-lg">ATENÇÃO: Não feche nem atualize a página!</h1>
+        </div>
+        <!-- Loading Spinner -->
+        <div id="spinner-screen" class="flex flex-col items-center justify-center space-y-6 py-8">
+          <div class="flex justify-center items-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+          </div>
+          <p class="text-gray-700 text-xl font-medium">Processando pagamento...</p>
+        </div>
+
+        <!-- Hidden BUY NOW button -->
+        <a href="https://go.perfectpay.com.br/PPU38CPRBQ0?upsell=true" id="buy-now-btn" class="hidden">BUY NOW</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT PARA REDIRECIONAMENTO AUTOMÁTICO (inspirado no da Cartpanda) -->
+  <script>
+    // Verifica se é um dispositivo móvel
+    if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('buy-now-btn');
+
+        if (!btn) return;
+
+        // Aguarda 5 segundos antes de redirecionar automaticamente
+        setTimeout(() => {
+          const isVisible = !!(btn.offsetWidth || btn.offsetHeight || btn.getClientRects().length);
+          if (isVisible || true) { // força redirecionamento mesmo se invisível
+            window.location.href = btn.href;
+          } else {
+            console.warn('Botão BUY NOW não está visível.');
+          }
+        }, 5000); // tempo de "processamento"
+      });
+    }
+  </script>
+</body>
+</html>
