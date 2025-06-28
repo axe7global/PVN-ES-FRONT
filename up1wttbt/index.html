@@ -69,9 +69,9 @@
     }
   </style>
 
-  <!-- Custom modal CSS -->
+  <!-- Custom modal CSS com cor clara para diferenciar -->
   <style>
-    /* Overlay */
+    /* Overlay semitransparente */
     #custom-modal-container {
       display: none;
       position: fixed;
@@ -94,9 +94,9 @@
       z-index: 99999;
     }
 
-    /* Caixa branca central com 70% de opacidade */
+    /* Caixa central com amarelo claro 70% */
     .custom-modal-content {
-      background-color: rgba(254, 254, 254, 0.7);
+      background-color: rgba(255, 255, 224, 0.7); /* LightYellow */
       border: 1px solid #888;
       border-radius: 10px;
       margin: auto;
@@ -106,7 +106,7 @@
       .custom-modal-content { width: 95%; }
     }
 
-    /* Botão de fechar */
+    /* Fechar */
     .custom-modal-close {
       background: #FFF;
       border: none;
@@ -142,7 +142,7 @@
       margin: 10px 0 20px;
     }
 
-    /* Detalhes de preço */
+    /* Detalhes de preço com amarelo suave */
     .custom-product-details {
       display: flex;
       flex-direction: column;
@@ -150,7 +150,7 @@
       justify-content: center;
     }
     .custom-price-wrapper {
-      background-color: #F9FAFB;
+      background-color: rgba(255, 250, 205, 0.7); /* LemonChiffon */
       border-radius: 7px;
       padding: 1rem;
       width: 80%;
@@ -175,7 +175,7 @@
       color: #5B636E !important;
     }
 
-    /* Rodapé e botões com 70% de opacidade */
+    /* Rodapé e botões com verde claro 70% */
     .custom-modal-footer {
       display: flex;
       flex-wrap: wrap;
@@ -186,7 +186,7 @@
       border-bottom-right-radius: 10px;
     }
     .custom-secondary-button {
-      background-color: rgba(255, 255, 255, 0.7);
+      background-color: rgba(224, 255, 224, 0.7); /* Honeydew */
       border: 1px solid #EEEFF1;
       border-radius: .3rem;
       color: #404958;
@@ -195,22 +195,22 @@
       cursor: pointer;
     }
     .custom-secondary-button:hover {
-      background-color: #F5F7FF;
+      background-color: rgba(224, 255, 224, 0.9);
       border-color: #3B82F6;
     }
     .custom-primary-button {
-      background-color: rgba(47, 81, 246, 0.7);
-      border: 1px solid rgba(47, 81, 246, 0.7);
+      background-color: rgba(224, 255, 224, 0.7); /* Honeydew */
+      border: 1px solid rgba(224, 255, 224, 0.7);
       border-radius: .3rem;
-      color: #FFF;
+      color: #FFFFFF;
       padding: .625rem 1.25rem;
       margin-left: 10px;
       font-size: .875rem;
       cursor: pointer;
     }
     .custom-primary-button:hover {
-      background-color: #3B82F6;
-      border-color: #3B82F6;
+      background-color: rgba(224, 255, 224, 0.9);
+      border-color: rgba(224, 255, 224, 0.9);
     }
     .custom-primary-button:focus {
       box-shadow: 0 0 0 3px rgba(66,153,225,.5);
@@ -228,12 +228,8 @@
           <button type="button" class="custom-modal-close" aria-label="Close modal">×</button>
           <!-- Corpo -->
           <div class="custom-modal-body">
-            <p class="custom-modal-title">
-              Additional payment of <span class="popup-offer-price">$0.34</span>
-            </p>
-            <p class="custom-modal-description">
-              This is a new offer. You will be charged an additional amount on your card.
-            </p>
+            <p class="custom-modal-title">Additional payment of <span class="popup-offer-price">$0.34</span></p>
+            <p class="custom-modal-description">This is a new offer. You will be charged an additional amount on your card.</p>
             <div class="custom-product-details">
               <div class="custom-price-wrapper">
                 <div class="custom-price-row">
@@ -251,13 +247,7 @@
                 <div style="display:flex; align-items:center; margin-top:.5rem;">
                   <div style="margin-right:3px; display:flex; align-items:center;">
                     <!-- SVG de informação -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0,0,256,256">
-                      <g fill="#5f6a77" stroke="#5f6a77" stroke-width="3">
-                        <g transform="scale(2,2)">
-                          <path d="M64,6c-32,0 -58,26 -58,58c0,32 26,58 58,58 32,0 58,-26 58,-58 0,-32 -26,-58 -58,-58zM64,12c28.7,0 52,23.3 52,52c0,28.7 -23.3,52 -52,52 -28.7,0 -52,-23.3 -52,-52 0,-28.7 23.3,-52 52,-52zM64,59c-5,0 -9,4 -9,9v24c0,5 4,9 9,9 5,0 9,-4 9,-9v-24c0,-5 -4,-9 -9,-9z"/>
-                        </g>
-                      </g>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0,0,256,256"><g fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0 -58,26 -58,58c0,32 26,58 58,58 32,0 58,-26 58,-58 0,-32 -26,-58 -58,-58zM64,12c28.7,0 52,23.3 52,52c0,28.7 -23.3,52 -52,52 -28.7,0 -52,-23.3 -52,-52 0,-28.7 23.3,-52 52,-52zM64,59c-5,0 -9,4 -9,9v24c0,5 4,9 9,9 5,0 9,-4 9,-9v-24c0,-5 -4,-9 -9,-9z"/></g></g></svg>
                   </div>
                   <small class="custom-price-info-text">You will be charged immediately</small>
                 </div>
@@ -360,7 +350,7 @@
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
 
-    // Fechar o modal customizado
+    // Fecha o modal customizado
     document.addEventListener('click', (e) => {
       if (e.target.matches('.custom-modal-close') || e.target.matches('.custom-secondary-button')) {
         document.getElementById('custom-modal-container').style.display = 'none';
