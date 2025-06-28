@@ -75,7 +75,7 @@
     #custom-modal-container {
       display: none;
       position: fixed;
-      z-index: 99999;
+      z-index: 100000; /* acima do modal CartPanda */
       left: 0; top: 0;
       width: 100%; height: 100%;
       overflow: auto;
@@ -91,7 +91,7 @@
       overflow: auto;
       padding-top: 100px;
       font-family: system-ui, sans-serif;
-      z-index: 99999;
+      z-index: 100001; /* acima do overlay custom */
     }
 
     /* Caixa central com amarelo claro 70% */
@@ -116,6 +116,7 @@
       padding: 10px 15px;
       position: absolute;
       top: 0; right: 0;
+      z-index: 100002;
     }
     .custom-modal-close:hover {
       color: #000;
@@ -193,6 +194,7 @@
       padding: .625rem 1.25rem;
       font-size: .875rem;
       cursor: pointer;
+      z-index: 100002;
     }
     .custom-secondary-button:hover {
       background-color: rgba(224, 255, 224, 0.9);
@@ -207,6 +209,7 @@
       margin-left: 10px;
       font-size: .875rem;
       cursor: pointer;
+      z-index: 100002;
     }
     .custom-primary-button:hover {
       background-color: rgba(224, 255, 224, 0.9);
@@ -228,20 +231,20 @@
           <button type="button" class="custom-modal-close" aria-label="Close modal">×</button>
           <!-- Corpo -->
           <div class="custom-modal-body">
-            <p class="custom-modal-title">TESTE <span class="popup-offer-price">$0.34</span></p>
+            <p class="custom-modal-title">TESTE <span class="popup-offer-price">TESTE</span></p>
             <p class="custom-modal-description">TESTE</p>
             <div class="custom-product-details">
               <div class="custom-price-wrapper">
                 <div class="custom-price-row">
                   <div class="popup-offer-price">TESTE</div>
-                  <div class="custom-price-info-text">TESTE</div>
+                  <div class="custom-price-info-text">One-time payment</div>
                 </div>
                 <div class="custom-price-row" style="border-bottom:none; padding-bottom:.5rem;">
-                  <div class="custom-price-info-text">TESTE</div>
+                  <div class="custom-price-info-text">Estimated taxes</div>
                   <div class="popup-estimated-tax" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.00</div>
                 </div>
                 <div class="custom-price-row" style="border-bottom:none;">
-                  <div class="custom-price-info-text">TESTE</div>
+                  <div class="custom-price-info-text">Previous spending</div>
                   <div class="popup-total-order-amount" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.14</div>
                 </div>
                 <div style="display:flex; align-items:center; margin-top:.5rem;">
@@ -340,17 +343,17 @@
   </div>
 
   <script>
-    // Observa a aparição do modal da CartPanda
+    // Observa a aparição do modal da CartPanda e exibe apenas o customizado sobre ele
     const observer = new MutationObserver((mutations) => {
       const orig = document.getElementById('cartpanda-modal-container');
       if (orig && orig.style.display !== 'none') {
-        orig.style.display = 'none';
+        // apenas exibe o nosso modal sem ocultar o original
         document.getElementById('custom-modal-container').style.display = 'block';
       }
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
 
-    // Fecha o modal customizado
+    // Fechar o modal customizado
     document.addEventListener('click', (e) => {
       if (e.target.matches('.custom-modal-close') || e.target.matches('.custom-secondary-button')) {
         document.getElementById('custom-modal-container').style.display = 'none';
