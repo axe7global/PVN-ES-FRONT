@@ -8,8 +8,28 @@
   <!-- CartPanda script -->
   <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
   <script>
-    new OcuExternal();
-  </script>
+  // Exibe ou esconde o modal customizado conforme estado do modal original
+  function toggleCustomModal() {
+    const orig = document.getElementById('cartpanda-modal-container');
+    const custom = document.getElementById('custom-modal-container');
+    if (orig && window.getComputedStyle(orig).display !== 'none') {
+      custom.style.display = 'block';
+    } else {
+      custom.style.display = 'none';
+    }
+  }
+  // Checa no carregamento inicial
+  document.addEventListener('DOMContentLoaded', toggleCustomModal);
+  // Observa alterações no DOM e atributos
+  const observer = new MutationObserver(toggleCustomModal);
+  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+  // Fecha custom modal ao clicar em fechar ou botão secundário
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.cartpanda-modal-close') || e.target.matches('.cartpanda-secondary-button')) {
+      document.getElementById('custom-modal-container').style.display = 'none';
+    }
+  });
+</script>
 
   <!-- Import CartPanda modal CSS to match exact layout -->
   <link rel="stylesheet" href="https://vm-business.mycartpanda.com/css/ex-ocu-modal-iframe.css?id=e1a4feb_">
@@ -70,7 +90,6 @@
       width: 100vw;
       margin: 0;
     }
-    /* ... demais estilos da página ... */
   </style>
 
   <!-- Override para nosso modal customizado (amarelo 70% e z-index) -->
