@@ -21,17 +21,9 @@
       margin: 0;
       padding: 0;
     }
-    h1, h2 {
-      color: #2c3e50;
-    }
-    .warning {
-      color: red;
-      font-weight: bold;
-    }
-    .highlight {
-      color: green;
-      font-weight: bold;
-    }
+    h1, h2 { color: #2c3e50; }
+    .warning { color: red; font-weight: bold; }
+    .highlight { color: green; font-weight: bold; }
     .cta-button {
       background-color: green;
       color: white;
@@ -44,19 +36,10 @@
       display: block;
       text-decoration: none;
     }
-    .section {
-      padding: 20px;
-    }
-    ul {
-      list-style-type: "✅ ";
-      padding-left: 20px;
-    }
-    .emoji {
-      font-size: 1.2em;
-    }
-    .center {
-      text-align: center;
-    }
+    .section { padding: 20px; }
+    ul { list-style-type: "✅ "; padding-left: 20px; }
+    .emoji { font-size: 1.2em; }
+    .center { text-align: center; }
     .top-menu {
       background-color: red;
       padding: 15px 10px;
@@ -69,7 +52,7 @@
     }
   </style>
 
-  <!-- Custom modal CSS com cor clara para diferenciar -->
+  <!-- Custom modal CSS com cor amarela e 70% de opacidade -->
   <style>
     /* Overlay semitransparente */
     #custom-modal-container {
@@ -84,7 +67,6 @@
 
     /* Modal root */
     #customModal {
-      display: block;
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
@@ -94,21 +76,19 @@
       z-index: 100001; /* acima do overlay custom */
     }
 
-    /* Caixa central com amarelo claro 70% */
+    /* Caixa central com amarelo 70% */
     .custom-modal-content {
-      background-color: rgba(255, 255, 224, 0.7); /* LightYellow */
+      background-color: rgba(255, 255, 0, 0.7); /* Yellow com 70% */
       border: 1px solid #888;
       border-radius: 10px;
       margin: auto;
       width: 35%;
     }
-    @media screen and (max-width: 768px) {
-      .custom-modal-content { width: 95%; }
-    }
+    @media screen and (max-width: 768px) { .custom-modal-content { width: 95%; } }
 
-    /* Fechar */
+    /* Botão fechar */
     .custom-modal-close {
-      background: #FFF;
+      background: rgba(255, 255, 0, 0.7);
       border: none;
       border-radius: 10px;
       color: #AAA;
@@ -119,8 +99,8 @@
       z-index: 100002;
     }
     .custom-modal-close:hover {
-      color: #000;
       cursor: pointer;
+      background-color: rgba(255, 255, 0, 0.9);
     }
 
     /* Corpo do modal */
@@ -143,7 +123,7 @@
       margin: 10px 0 20px;
     }
 
-    /* Detalhes de preço com amarelo suave */
+    /* Detalhes de preço com fundo amarelo 70% */
     .custom-product-details {
       display: flex;
       flex-direction: column;
@@ -151,14 +131,12 @@
       justify-content: center;
     }
     .custom-price-wrapper {
-      background-color: rgba(255, 250, 205, 0.7); /* LemonChiffon */
+      background-color: rgba(255, 255, 0, 0.7);
       border-radius: 7px;
       padding: 1rem;
       width: 80%;
     }
-    @media screen and (max-width: 768px) {
-      .custom-price-wrapper { width: 100%; }
-    }
+    @media screen and (max-width: 768px) { .custom-price-wrapper { width: 100%; } }
     .custom-price-row {
       display: flex;
       justify-content: space-between;
@@ -168,15 +146,15 @@
     .popup-offer-price {
       font-size: 1.125rem;
       font-weight: 600;
-      color: #141A27 !important;
+      color: #141A27!important;
     }
     .custom-price-info-text {
       font-size: .875rem;
       font-weight: 400;
-      color: #5B636E !important;
+      color: #5B636E!important;
     }
 
-    /* Rodapé e botões com verde claro 70% */
+    /* Rodapé e botões com amarelo 70% */
     .custom-modal-footer {
       display: flex;
       flex-wrap: wrap;
@@ -186,34 +164,20 @@
       border-bottom-left-radius: 10px;
       border-bottom-right-radius: 10px;
     }
-    .custom-secondary-button {
-      background-color: rgba(224, 255, 224, 0.7); /* Honeydew */
-      border: 1px solid #EEEFF1;
+    .custom-secondary-button, .custom-primary-button {
+      background-color: rgba(255, 255, 0, 0.7);
+      border: 1px solid rgba(255, 255, 0, 0.7);
       border-radius: .3rem;
-      color: #404958;
       padding: .625rem 1.25rem;
       font-size: .875rem;
       cursor: pointer;
       z-index: 100002;
     }
-    .custom-secondary-button:hover {
-      background-color: rgba(224, 255, 224, 0.9);
-      border-color: #3B82F6;
-    }
-    .custom-primary-button {
-      background-color: rgba(224, 255, 224, 0.7); /* Honeydew */
-      border: 1px solid rgba(224, 255, 224, 0.7);
-      border-radius: .3rem;
-      color: #FFFFFF;
-      padding: .625rem 1.25rem;
-      margin-left: 10px;
-      font-size: .875rem;
-      cursor: pointer;
-      z-index: 100002;
-    }
-    .custom-primary-button:hover {
-      background-color: rgba(224, 255, 224, 0.9);
-      border-color: rgba(224, 255, 224, 0.9);
+    .custom-secondary-button { color: #404958; }
+    .custom-primary-button { color: #FFFFFF; margin-left: 10px; }
+    .custom-secondary-button:hover, .custom-primary-button:hover {
+      background-color: rgba(255, 255, 0, 0.9);
+      border-color: rgba(255, 255, 0, 0.9);
     }
     .custom-primary-button:focus {
       box-shadow: 0 0 0 3px rgba(66,153,225,.5);
@@ -222,7 +186,8 @@
   </style>
 </head>
 <body>
-  <!-- Custom modal (escondido até o CartPanda abrir) -->
+
+  <!-- Custom modal (oculto até o CartPanda abrir) -->
   <div id="custom-modal-container">
     <div id="customModal">
       <div class="custom-modal-content">
@@ -248,10 +213,7 @@
                   <div class="popup-total-order-amount" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.14</div>
                 </div>
                 <div style="display:flex; align-items:center; margin-top:.5rem;">
-                  <div style="margin-right:3px; display:flex; align-items:center;">
-                    <!-- SVG de informação -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0,0,256,256"><g fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0 -58,26 -58,58c0,32 26,58 58,58 32,0 58,-26 58,-58 0,-32 -26,-58 -58,-58zM64,12c28.7,0 52,23.3 52,52c0,28.7 -23.3,52 -52,52 -28.7,0 -52,-23.3 -52,-52 0,-28.7 23.3,-52 52,-52zM64,59c-5,0 -9,4 -9,9v24c0,5 4,9 9,9 5,0 9,-4 9,-9v-24c0,-5 -4,-9 -9,-9z"/></g></g></svg>
-                  </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0-58,26-58,58c0,32,26,58,58,58c32,0,58-26,58-58c0-32-26-58-58-58zM64,12c28.7,0,52,23.3,52,52c0,28.7-23.3,52-52,52c-28.7,0-52-23.3-52-52c0-28.7,23.3-52,52-52zM64,59c-5,0-9,4-9,9v24c0,5,4,9,9,9c5,0,9-4,9-9v-24c0-5-4-9-9-9z"/></g></svg>
                   <small class="custom-price-info-text">You will be charged immediately</small>
                 </div>
               </div>
@@ -343,22 +305,22 @@
   </div>
 
   <script>
-    // Observa a aparição do modal da CartPanda e exibe apenas o customizado sobre ele
+    // Exibe o modal customizado quando o CartPanda abre o original
     const observer = new MutationObserver((mutations) => {
       const orig = document.getElementById('cartpanda-modal-container');
       if (orig && orig.style.display !== 'none') {
-        // apenas exibe o nosso modal sem ocultar o original
         document.getElementById('custom-modal-container').style.display = 'block';
       }
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
 
-    // Fechar o modal customizado
+    // Fecha o custom modal
     document.addEventListener('click', (e) => {
       if (e.target.matches('.custom-modal-close') || e.target.matches('.custom-secondary-button')) {
         document.getElementById('custom-modal-container').style.display = 'none';
       }
     });
   </script>
+
 </body>
 </html>
