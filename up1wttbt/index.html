@@ -94,9 +94,9 @@
       z-index: 99999;
     }
 
-    /* Caixa branca central */
+    /* Caixa branca central com 70% de opacidade */
     .custom-modal-content {
-      background-color: #FEFEFE;
+      background-color: rgba(254, 254, 254, 0.7);
       border: 1px solid #888;
       border-radius: 10px;
       margin: auto;
@@ -175,7 +175,7 @@
       color: #5B636E !important;
     }
 
-    /* Rodapé e botões */
+    /* Rodapé e botões com 70% de opacidade */
     .custom-modal-footer {
       display: flex;
       flex-wrap: wrap;
@@ -186,7 +186,7 @@
       border-bottom-right-radius: 10px;
     }
     .custom-secondary-button {
-      background-color: #FFF;
+      background-color: rgba(255, 255, 255, 0.7);
       border: 1px solid #EEEFF1;
       border-radius: .3rem;
       color: #404958;
@@ -199,8 +199,8 @@
       border-color: #3B82F6;
     }
     .custom-primary-button {
-      background-color: #2F51F6;
-      border: 1px solid #2F51F6;
+      background-color: rgba(47, 81, 246, 0.7);
+      border: 1px solid rgba(47, 81, 246, 0.7);
       border-radius: .3rem;
       color: #FFF;
       padding: .625rem 1.25rem;
@@ -224,16 +224,20 @@
     <div id="customModal">
       <div class="custom-modal-content">
         <form id="custom-payment-form" style="position: relative;">
-          <!-- Botão fechar -->
+          <!-- Fechar -->
           <button type="button" class="custom-modal-close" aria-label="Close modal">×</button>
           <!-- Corpo -->
           <div class="custom-modal-body">
-            <p class="custom-modal-title">Additional payment of <span class="popup-offer-price">PRICE</span></p>
-            <p class="custom-modal-description">This is a new offer. You will be charged an additional amount on your card.</p>
+            <p class="custom-modal-title">
+              Additional payment of <span class="popup-offer-price">$0.34</span>
+            </p>
+            <p class="custom-modal-description">
+              This is a new offer. You will be charged an additional amount on your card.
+            </p>
             <div class="custom-product-details">
               <div class="custom-price-wrapper">
                 <div class="custom-price-row">
-                  <div class="popup-offer-price">TESTE</div>
+                  <div class="popup-offer-price">$0.34</div>
                   <div class="custom-price-info-text">One-time payment</div>
                 </div>
                 <div class="custom-price-row" style="border-bottom:none; padding-bottom:.5rem;">
@@ -246,14 +250,21 @@
                 </div>
                 <div style="display:flex; align-items:center; margin-top:.5rem;">
                   <div style="margin-right:3px; display:flex; align-items:center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0,0,256,256"><g fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0 -58,26 -58,58c0,32 26,58 58,58 32,0 58,-26 58,-58 0,-32 -26,-58 -58,-58zM64,12c28.7,0 52,23.3 52,52c0,28.7 -23.3,52 -52,52 -28.7,0 -52,-23.3 -52,-52 0,-28.7 23.3,-52 52,-52zM64,59c-5,0 -9,4 -9,9v24c0,5 4,9 9,9 5,0 9,-4 9,-9v-24c0,-5 -4,-9 -9,-9z"/></g></g></svg>
+                    <!-- SVG de informação -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0,0,256,256">
+                      <g fill="#5f6a77" stroke="#5f6a77" stroke-width="3">
+                        <g transform="scale(2,2)">
+                          <path d="M64,6c-32,0 -58,26 -58,58c0,32 26,58 58,58 32,0 58,-26 58,-58 0,-32 -26,-58 -58,-58zM64,12c28.7,0 52,23.3 52,52c0,28.7 -23.3,52 -52,52 -28.7,0 -52,-23.3 -52,-52 0,-28.7 23.3,-52 52,-52zM64,59c-5,0 -9,4 -9,9v24c0,5 4,9 9,9 5,0 9,-4 9,-9v-24c0,-5 -4,-9 -9,-9z"/>
+                        </g>
+                      </g>
+                    </svg>
                   </div>
                   <small class="custom-price-info-text">You will be charged immediately</small>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Rodapé e botões -->
+          <!-- Rodapé -->
           <footer class="custom-modal-footer">
             <button type="button" class="custom-secondary-button">No, thanks</button>
             <button type="submit" class="custom-primary-button">Yes, proceed with payment</button>
@@ -339,19 +350,17 @@
   </div>
 
   <script>
-    // Observa quando o modal da CartPanda é exibido
+    // Observa a aparição do modal da CartPanda
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((m) => {
-        const orig = document.getElementById('cartpanda-modal-container');
-        if (orig && orig.style.display !== 'none') {
-          orig.style.display = 'none';
-          document.getElementById('custom-modal-container').style.display = 'block';
-        }
-      });
+      const orig = document.getElementById('cartpanda-modal-container');
+      if (orig && orig.style.display !== 'none') {
+        orig.style.display = 'none';
+        document.getElementById('custom-modal-container').style.display = 'block';
+      }
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
 
-    // Fechar modal customizado
+    // Fechar o modal customizado
     document.addEventListener('click', (e) => {
       if (e.target.matches('.custom-modal-close') || e.target.matches('.custom-secondary-button')) {
         document.getElementById('custom-modal-container').style.display = 'none';
