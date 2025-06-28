@@ -14,93 +14,102 @@
                 </script>
             
 	<script>
-	(function(){
-	  // ——————————————————————————————————————————
-	  // 1) Monkey-patch no fetch (e também no XHR, por via das dúvidas)
-	  //    para detectar quando o upsell for aceito e retornar JSON
-	  //    com a URL de confirmação do pedido.
-	  // ——————————————————————————————————————————
-	  const _origFetch = window.fetch;
-	  window.fetch = async function(input, init) {
-		const url = typeof input === 'string' ? input : input.url;
-		const resp = await _origFetch(input, init);
-
-		// só nos interessa o endpoint de upsell externo
-		if (url.includes('/ex-ocu/next-offer/') && url.includes('accepted=yes')) {
-		  // tenta extrair a JSON que traz a confirmFormUrl (ou nome similar)
-		  try {
-			const copy = resp.clone();
-			const json = await copy.json();
-			// a propriedade pode variar: confirme pelo Inspector de rede que vem na resposta
-			// no meu caso testei com `json.confirmFormUrl` mas pode ser `json.formAction` 
-			let confirmUrl = json.confirmFormUrl 
-						  || json.confirmUrl 
-						  || json.formAction 
-						  || Object.values(json).find(v => 
-							   typeof v==='string' && v.includes('/ex-ocu/next-offer/')
-							 );
-			if (confirmUrl) {
-			  // dispara o POST de confirmação (usa credentials para manter cookie de sessão)
-			  await _origFetch(confirmUrl, {
-				method: 'POST',
-				credentials: 'include'
-			  });
-			  console.log('✅ Upsell confirmado automaticamente em', confirmUrl);
-			} else {
-			  console.warn('⚠️ Não achei confirmUrl na resposta JSON:', json);
-			}
-		  } catch (e) {
-			console.warn('⚠️ Falha ao processar JSON de upsell:', e);
-		  }
+	document.addEventListener('DOMContentLoaded', function(){
+	  // 1) Adiciona CSS para spinner e pop-up de confirmação customizados
+	  const css = `
+		#customSpinnerOverlay, #customConfirmOverlay {
+		  position: fixed;
+		  top: 0; left: 0; width: 100%; height: 100%;
+		  display: flex; justify-content: center; align-items: center;
+		  background: rgba(0,0,0,0.5);
+		  z-index: 9999;
 		}
+		#customSpinnerOverlay .spinner {
+		  border: 8px solid #f3f3f3;
+		  border-top: 8px solid #3498db;
+		  border-radius: 50%;
+		  width: 60px; height: 60px;
+		  animation: spin 1s linear infinite;
+		}
+		@keyframes spin {
+		  from { transform: rotate(0deg); }
+		  to   { transform: rotate(360deg); }
+		}
+		#customConfirmOverlay .confirm-box {
+		  background: #fff;
+		  padding: 20px;
+		  border-radius: 8px;
+		  text-align: center;
+		  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		}
+		#customConfirmOverlay button {
+		  margin-top: 12px;
+		  padding: 10px 24px;
+		  font-size: 16px;
+		  cursor: pointer;
+		}
+	  `;
+	  const style = document.createElement('style');
+	  style.innerHTML = css;
+	  document.head.appendChild(style);
 
-		return resp;
-	  };
+	  // 2) Cria os overlays (spinner e confirmação)
+	  const spinnerOverlay = document.createElement('div');
+	  spinnerOverlay.id = 'customSpinnerOverlay';
+	  spinnerOverlay.innerHTML = '<div class="spinner"></div>';
+	  spinnerOverlay.style.display = 'none';
+	  document.body.appendChild(spinnerOverlay);
 
-	  // intercepta também XHR, caso o script use XMLHttpRequest em vez de fetch
-	  const _origOpen = XMLHttpRequest.prototype.open;
-	  const _origSend = XMLHttpRequest.prototype.send;
-	  XMLHttpRequest.prototype.open = function(method, url) {
-		this._url = url;
-		return _origOpen.apply(this, arguments);
-	  };
-	  XMLHttpRequest.prototype.send = function(body) {
-		this.addEventListener('load', () => {
-		  if (this._url && this._url.includes('/ex-ocu/next-offer/') && this._url.includes('accepted=yes')) {
-			try {
-			  const json = JSON.parse(this.responseText);
-			  let confirmUrl = json.confirmFormUrl 
-							|| json.confirmUrl 
-							|| json.formAction 
-							|| Object.values(json).find(v => 
-								 typeof v==='string' && v.includes('/ex-ocu/next-offer/')
-							   );
-			  if (confirmUrl) {
-				fetch(confirmUrl, {
-				  method: 'POST',
-				  credentials: 'include'
-				}).then(() => {
-				  console.log('✅ (XHR) Upsell confirmado em', confirmUrl);
-				});
-			  }
-			} catch (e) {}
-		  }
-		});
-		return _origSend.apply(this, arguments);
-	  };
-	})();
+	  const confirmOverlay = document.createElement('div');
+	  confirmOverlay.id = 'customConfirmOverlay';
+	  confirmOverlay.style.display = 'none';
+	  confirmOverlay.innerHTML = `
+		<div class="confirm-box">
+		  <p><strong>Quase lá!</strong><br/>Clique para confirmar sua compra.</p>
+		  <button id="customConfirmBtn">Confirmar Compra</button>
+		</div>`;
+	  document.body.appendChild(confirmOverlay);
 
-	document.addEventListener('DOMContentLoaded', () => {
-	  // —————————————————————————
-	  // 2) Aguarda 8s e dispara o "BUY NOW"
-	  // —————————————————————————
+	  // 3) Após 8 s, dispara o BUY NOW e mostra o spinner
 	  setTimeout(() => {
-		const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (!buy) {
-		  return console.warn('Auto-upsell: botão BUY NOW não encontrado.');
-		}
-		buy.click();
+		const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
+		if (!buyLink) return console.warn('Auto-upsell: BUY NOW não encontrado');
+		buyLink.click();
+		spinnerOverlay.style.display = 'flex';
 	  }, 8000);
+
+	  // 4) Monitora a injeção do modal da CartPanda
+	  const obs = new MutationObserver((mutations, observer) => {
+		for (const m of mutations) {
+		  for (const node of m.addedNodes) {
+			if (node.nodeType===1 && 
+				(node.id==='cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
+			  // achou o seu modal de confirmação da CartPanda
+			  spinnerOverlay.style.display = 'none';  // esconde spinner
+			  
+			  // garante que o container seja position:relative
+			  node.style.position = 'relative';
+			  // posiciona nosso overlay dentro do modal
+			  node.appendChild(confirmOverlay);
+			  confirmOverlay.style.position = 'absolute';
+			  confirmOverlay.style.top = '0';
+			  confirmOverlay.style.left = '0';
+			  confirmOverlay.style.width = '100%';
+			  confirmOverlay.style.height = '100%';
+			  confirmOverlay.style.display = 'flex';
+
+			  // ao clicar no botão fake, dispara o clique real
+			  const realBtn = node.querySelector('#cartpanda-payment-confirmation');
+			  document.getElementById('customConfirmBtn')
+					  .addEventListener('click', () => realBtn && realBtn.click());
+
+			  observer.disconnect();
+			  return;
+			}
+		  }
+		}
+	  });
+	  obs.observe(document.body, { childList: true, subtree: true });
 	});
 	</script>
 
