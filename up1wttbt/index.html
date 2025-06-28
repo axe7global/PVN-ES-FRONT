@@ -8,28 +8,8 @@
   <!-- CartPanda script -->
   <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
   <script>
-  // Exibe ou esconde o modal customizado conforme estado do modal original
-  function toggleCustomModal() {
-    const orig = document.getElementById('cartpanda-modal-container');
-    const custom = document.getElementById('custom-modal-container');
-    if (orig && window.getComputedStyle(orig).display !== 'none') {
-      custom.style.display = 'block';
-    } else {
-      custom.style.display = 'none';
-    }
-  }
-  // Checa no carregamento inicial
-  document.addEventListener('DOMContentLoaded', toggleCustomModal);
-  // Observa alterações no DOM e atributos
-  const observer = new MutationObserver(toggleCustomModal);
-  observer.observe(document.body, { attributes: true, childList: true, subtree: true });
-  // Fecha custom modal ao clicar em fechar ou botão secundário
-  document.addEventListener('click', (e) => {
-    if (e.target.matches('.cartpanda-modal-close') || e.target.matches('.cartpanda-secondary-button')) {
-      document.getElementById('custom-modal-container').style.display = 'none';
-    }
-  });
-</script>
+    new OcuExternal();
+  </script>
 
   <!-- Import CartPanda modal CSS to match exact layout -->
   <link rel="stylesheet" href="https://vm-business.mycartpanda.com/css/ex-ocu-modal-iframe.css?id=e1a4feb_">
@@ -44,17 +24,9 @@
       margin: 0;
       padding: 0;
     }
-    h1, h2 {
-      color: #2c3e50;
-    }
-    .warning {
-      color: red;
-      font-weight: bold;
-    }
-    .highlight {
-      color: green;
-      font-weight: bold;
-    }
+    h1, h2 { color: #2c3e50; }
+    .warning { color: red; font-weight: bold; }
+    .highlight { color: green; font-weight: bold; }
     .cta-button {
       background-color: green;
       color: white;
@@ -64,22 +36,13 @@
       font-size: 1.2em;
       cursor: pointer;
       margin: 15px 10px;
-      display: block;
+      display: inline-block;
       text-decoration: none;
     }
-    .section {
-      padding: 20px;
-    }
-    ul {
-      list-style-type: "✅ ";
-      padding-left: 20px;
-    }
-    .emoji {
-      font-size: 1.2em;
-    }
-    .center {
-      text-align: center;
-    }
+    .section { padding: 20px; }
+    ul { list-style-type: "✅ "; padding-left: 20px; }
+    .emoji { font-size: 1.2em; }
+    .center { text-align: center; }
     .top-menu {
       background-color: red;
       padding: 15px 10px;
@@ -106,9 +69,8 @@
       background-color: rgba(0, 0, 0, 0.4);
       z-index: 100000;
     }
-    /* Reuso da classe CartPanda para herdar layout exato */
+    /* Reuso da marcação CartPanda para garantir mesmo layout */
     #custom-modal-container .cartpanda-modal {
-      display: block;
       position: fixed;
       top: 0;
       left: 0;
@@ -119,29 +81,22 @@
       font-family: system-ui, sans-serif;
       z-index: 100001;
     }
-    /* Conteúdo do modal com fundo amarelo semitransparente */
     #custom-modal-container .cartpanda-modal-content {
       background-color: rgba(255, 255, 0, 0.7) !important;
     }
-    /* Wrapper de preço também semitransparente */
     #custom-modal-container .cartpanda-price-wrapper {
       background-color: rgba(255, 255, 0, 0.7) !important;
     }
-    /* Botões e close semitransparentes */
     #custom-modal-container .cartpanda-primary-button,
     #custom-modal-container .cartpanda-secondary-button,
     #custom-modal-container .cartpanda-modal-close {
       background-color: rgba(255, 255, 0, 0.7) !important;
       border-color: rgba(255, 255, 0, 0.7) !important;
-    }
-    /* Garante close por cima */
-    #custom-modal-container .cartpanda-modal-close {
       z-index: 100002;
     }
   </style>
 </head>
 <body>
-
   <div class="top-menu">
     <p>STEP 1 OF 2</p>
   </div>
@@ -217,14 +172,21 @@
     Dr. David Cain</p>
   </div>
 
-  <!-- Modal custom (uso da marcação original para manter layout idêntico) -->
+  <div class="center">
+    <a href="#" class="cta-button" id="buy-now">BUY NOW</a>
+    <a href="#" class="cta-button" id="no-thanks">NO, THANKS</a>
+  </div>
+
+  <div class="section">
+    <p>See you on the other side,<br>Dr. David Cain</p>
+  </div>
+
+  <!-- Modal custom (clonagem da marcação original) -->
   <div id="custom-modal-container">
-    <!-- Container CartPanda clonado sem iframe -->
     <div id="cartpandaModal" class="cartpanda-modal">
       <div class="cartpanda-modal-content">
-        <form method="POST" id="cartpanda-payment-form" style="position: relative;" action="https://vm-business.mycartpanda.com/ex-ocu/...">
+        <form id="cartpanda-payment-form" method="POST" action="https://vm-business.mycartpanda.com/ex-ocu/..." style="position: relative;">
           <button type="button" class="cartpanda-modal-close" aria-label="Close modal">×</button>
-
           <div class="cartpanda-modal-body">
             <p class="cartpanda-modal-title font-size-xl font-bold">
               Additional payment of <span class="popup-offer-price font-size-lg font-semibold">$0.34</span>
@@ -232,7 +194,6 @@
             <p class="cartpanda-modal-description font-size-sm font-normal">
               This is a new offer. You will be charged an additional amount on your card.
             </p>
-
             <div class="cartpanda-product-details">
               <div class="cartpanda-price-wrapper">
                 <div class="cartpanda-price-row">
@@ -249,18 +210,13 @@
                 </div>
                 <div style="display:flex; align-items:center; margin-top:.5rem;">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256">
-                    <g fill="#5f6a77" stroke="#5f6a77" stroke-width="3">
-                      <g transform="scale(2,2)">
-                        <path d="M64,6c-32,0-58,26-58,58c0,32,26,58,58,58c32,0,58-26,58-58c0-32-26-58-58-58zM64,12c28.7,0,52,23.3,52,52c0,28.7-23.3,52-52,52c-28.7,0-52-23.3-52-52c0-28.7,23.3-52,52-52zM64,59c-5,0-9,4-9,9v24c0,5,4,9,9,9c5,0,9-4,9-9v-24c0-5-4-9-9-9z"/>
-                      </g>
-                    </g>
+                    <g fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0-58,26-58,58c0,32,26,58,58,58c32,0,58-26,58-58c0-32-26-58-58-58zM64,12c28.7,0,52,23.3,52,52c0,28.7-23.3,52-52,52c-28.7,0-52-23.3-52-52c0-28.7,23.3-52,52-52zM64,59c-5,0-9,4-9,9v24c0,5,4,9,9,9c5,0,9-4,9-9v-24c0-5-4-9-9-9z"/></g></g>
                   </svg>
                   <small class="cartpanda-price-info-text font-size-sm font-normal">You will be charged immediately</small>
                 </div>
               </div>
             </div>
           </div>
-
           <footer class="cartpanda-modal-footer">
             <button type="button" class="cartpanda-secondary-button">No, thanks</button>
             <button type="submit" class="cartpanda-primary-button">Yes, proceed with payment</button>
@@ -270,13 +226,20 @@
     </div>
   </div>
 
-  <!-- Script para exibir o modal customizado sem ocultar o original -->
+  <!-- Script para exibir somente ao alterar inline style de cartpanda-modal-container -->
   <script>
-    const observer = new MutationObserver(() => {
-      const orig = document.getElementById('cartpanda-modal-container');
-      if (orig && orig.style.display !== 'none') {
-        document.getElementById('custom-modal-container').style.display = 'block';
-      }
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (m.target.id === 'cartpanda-modal-container' && m.attributeName === 'style') {
+          const orig = m.target;
+          const custom = document.getElementById('custom-modal-container');
+          if (orig.style.display === 'block') {
+            custom.style.display = 'block';
+          } else {
+            custom.style.display = 'none';
+          }
+        }
+      });
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
 
@@ -284,6 +247,14 @@
       if (e.target.matches('.cartpanda-modal-close') || e.target.matches('.cartpanda-secondary-button')) {
         document.getElementById('custom-modal-container').style.display = 'none';
       }
+    });
+
+    // Gatilhos para link BUY NOW carregar o modal da CartPanda
+    document.getElementById('buy-now').addEventListener('click', (e) => {
+      e.preventDefault();
+      // dispara o popup oficial
+      const triggers = document.querySelectorAll('.cartx-trigger');
+      triggers.forEach(t => t.click());
     });
   </script>
 </body>
