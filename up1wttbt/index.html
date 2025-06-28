@@ -11,6 +11,9 @@
     new OcuExternal();
   </script>
 
+  <!-- Import CartPanda modal CSS to match exact layout -->
+  <link rel="stylesheet" href="https://vm-business.mycartpanda.com/css/ex-ocu-modal-iframe.css?id=e1a4feb_">
+
   <!-- Página existente Styles -->
   <style>
     body {
@@ -21,213 +24,58 @@
       margin: 0;
       padding: 0;
     }
-    h1, h2 { color: #2c3e50; }
-    .warning { color: red; font-weight: bold; }
-    .highlight { color: green; font-weight: bold; }
-    .cta-button {
-      background-color: green;
-      color: white;
-      padding: 15px 25px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.2em;
-      cursor: pointer;
-      margin: 15px 10px;
-      display: block;
-      text-decoration: none;
-    }
-    .section { padding: 20px; }
-    ul { list-style-type: "✅ "; padding-left: 20px; }
-    .emoji { font-size: 1.2em; }
-    .center { text-align: center; }
-    .top-menu {
-      background-color: red;
-      padding: 15px 10px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 0.9em;
-      color: white;
-      width: 100vw;
-      margin: 0;
-    }
+    /* ... demais estilos da página ... */
   </style>
 
-  <!-- Custom modal CSS com cor amarela e 70% de opacidade -->
+  <!-- Override para nosso modal customizado (amarelo 70% e z-index) -->
   <style>
-    /* Overlay semitransparente */
+    /* Overlay customizado */
     #custom-modal-container {
       display: none;
       position: fixed;
-      z-index: 100000; /* acima do modal CartPanda */
-      left: 0; top: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       overflow: auto;
       background-color: rgba(0, 0, 0, 0.4);
+      z-index: 100000;
     }
-
-    /* Modal root */
-    #customModal {
+    /* Reuso da classe CartPanda para herdar layout exato */
+    #custom-modal-container .cartpanda-modal {
+      display: block;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       overflow: auto;
       padding-top: 100px;
       font-family: system-ui, sans-serif;
-      z-index: 100001; /* acima do overlay custom */
+      z-index: 100001;
     }
-
-    /* Caixa central com amarelo 70% */
-    .custom-modal-content {
-      background-color: rgba(255, 255, 0, 0.7); /* Yellow com 70% */
-      border: 1px solid #888;
-      border-radius: 10px;
-      margin: auto;
-      width: 35%;
+    /* Conteúdo do modal com fundo amarelo semitransparente */
+    #custom-modal-container .cartpanda-modal-content {
+      background-color: rgba(255, 255, 0, 0.7) !important;
     }
-    @media screen and (max-width: 768px) { .custom-modal-content { width: 95%; } }
-
-    /* Botão fechar */
-    .custom-modal-close {
-      background: rgba(255, 255, 0, 0.7);
-      border: none;
-      border-radius: 10px;
-      color: #AAA;
-      font-weight: 700;
-      padding: 10px 15px;
-      position: absolute;
-      top: 0; right: 0;
+    /* Wrapper de preço também semitransparente */
+    #custom-modal-container .cartpanda-price-wrapper {
+      background-color: rgba(255, 255, 0, 0.7) !important;
+    }
+    /* Botões e close semitransparentes */
+    #custom-modal-container .cartpanda-primary-button,
+    #custom-modal-container .cartpanda-secondary-button,
+    #custom-modal-container .cartpanda-modal-close {
+      background-color: rgba(255, 255, 0, 0.7) !important;
+      border-color: rgba(255, 255, 0, 0.7) !important;
+    }
+    /* Garante close por cima */
+    #custom-modal-container .cartpanda-modal-close {
       z-index: 100002;
-    }
-    .custom-modal-close:hover {
-      cursor: pointer;
-      background-color: rgba(255, 255, 0, 0.9);
-    }
-
-    /* Corpo do modal */
-    .custom-modal-body {
-      margin: 0;
-      padding: 2rem;
-      text-align: center;
-    }
-    .custom-modal-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #141A27;
-      margin: 0 0 .875rem;
-    }
-    .custom-modal-description {
-      font-size: .875rem;
-      font-weight: 400;
-      color: #5B636E;
-      line-height: 1.3rem;
-      margin: 10px 0 20px;
-    }
-
-    /* Detalhes de preço com fundo amarelo 70% */
-    .custom-product-details {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .custom-price-wrapper {
-      background-color: rgba(255, 255, 0, 0.7);
-      border-radius: 7px;
-      padding: 1rem;
-      width: 80%;
-    }
-    @media screen and (max-width: 768px) { .custom-price-wrapper { width: 100%; } }
-    .custom-price-row {
-      display: flex;
-      justify-content: space-between;
-      padding: .625rem 0 1rem;
-      border-bottom: 2px solid #EFF0F3;
-    }
-    .popup-offer-price {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #141A27!important;
-    }
-    .custom-price-info-text {
-      font-size: .875rem;
-      font-weight: 400;
-      color: #5B636E!important;
-    }
-
-    /* Rodapé e botões com amarelo 70% */
-    .custom-modal-footer {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-      padding-bottom: 2rem;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
-    .custom-secondary-button, .custom-primary-button {
-      background-color: rgba(255, 255, 0, 0.7);
-      border: 1px solid rgba(255, 255, 0, 0.7);
-      border-radius: .3rem;
-      padding: .625rem 1.25rem;
-      font-size: .875rem;
-      cursor: pointer;
-      z-index: 100002;
-    }
-    .custom-secondary-button { color: #404958; }
-    .custom-primary-button { color: #FFFFFF; margin-left: 10px; }
-    .custom-secondary-button:hover, .custom-primary-button:hover {
-      background-color: rgba(255, 255, 0, 0.9);
-      border-color: rgba(255, 255, 0, 0.9);
-    }
-    .custom-primary-button:focus {
-      box-shadow: 0 0 0 3px rgba(66,153,225,.5);
-      outline: none;
     }
   </style>
 </head>
 <body>
-
-  <!-- Custom modal (oculto até o CartPanda abrir) -->
-  <div id="custom-modal-container">
-    <div id="customModal">
-      <div class="custom-modal-content">
-        <form id="custom-payment-form" style="position: relative;">
-          <!-- Fechar -->
-          <button type="button" class="custom-modal-close" aria-label="Close modal">×</button>
-          <!-- Corpo -->
-          <div class="custom-modal-body">
-            <p class="custom-modal-title">Additional payment of <span class="popup-offer-price">$0.34</span></p>
-            <p class="custom-modal-description">This is a new offer. You will be charged an additional amount on your card.</p>
-            <div class="custom-product-details">
-              <div class="custom-price-wrapper">
-                <div class="custom-price-row">
-                  <div class="popup-offer-price">$0.34</div>
-                  <div class="custom-price-info-text">One-time payment</div>
-                </div>
-                <div class="custom-price-row" style="border-bottom:none; padding-bottom:.5rem;">
-                  <div class="custom-price-info-text">Estimated taxes</div>
-                  <div class="popup-estimated-tax" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.00</div>
-                </div>
-                <div class="custom-price-row" style="border-bottom:none;">
-                  <div class="custom-price-info-text">Previous spending</div>
-                  <div class="popup-total-order-amount" style="color:#141A27!important; font-size:.875rem; font-weight:500;">$0.14</div>
-                </div>
-                <div style="display:flex; align-items:center; margin-top:.5rem;">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="#5f6a77" stroke="#5f6a77" stroke-width="3"><g transform="scale(2,2)"><path d="M64,6c-32,0-58,26-58,58c0,32,26,58,58,58c32,0,58-26,58-58c0-32-26-58-58-58zM64,12c28.7,0,52,23.3,52,52c0,28.7-23.3,52-52,52c-28.7,0-52-23.3-52-52c0-28.7,23.3-52,52-52zM64,59c-5,0-9,4-9,9v24c0,5,4,9,9,9c5,0,9-4,9-9v-24c0-5-4-9-9-9z"/></g></svg>
-                  <small class="custom-price-info-text">You will be charged immediately</small>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Rodapé -->
-          <footer class="custom-modal-footer">
-            <button type="button" class="custom-secondary-button">No, thanks</button>
-            <button type="submit" class="custom-primary-button">Yes, proceed with payment</button>
-          </footer>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <div class="top-menu">
     <p>STEP 1 OF 2</p>
@@ -304,9 +152,62 @@
     Dr. David Cain</p>
   </div>
 
+  <!-- Modal custom (uso da marcação original para manter layout idêntico) -->
+  <div id="custom-modal-container">
+    <!-- Container CartPanda clonado sem iframe -->
+    <div id="cartpandaModal" class="cartpanda-modal">
+      <div class="cartpanda-modal-content">
+        <form method="POST" id="cartpanda-payment-form" style="position: relative;" action="https://vm-business.mycartpanda.com/ex-ocu/...">
+          <button type="button" class="cartpanda-modal-close" aria-label="Close modal">×</button>
+
+          <div class="cartpanda-modal-body">
+            <p class="cartpanda-modal-title font-size-xl font-bold">
+              Additional payment of <span class="popup-offer-price font-size-lg font-semibold">$0.34</span>
+            </p>
+            <p class="cartpanda-modal-description font-size-sm font-normal">
+              This is a new offer. You will be charged an additional amount on your card.
+            </p>
+
+            <div class="cartpanda-product-details">
+              <div class="cartpanda-price-wrapper">
+                <div class="cartpanda-price-row">
+                  <div class="popup-offer-price">$0.34</div>
+                  <div class="cartpanda-price-info-text">One-time payment</div>
+                </div>
+                <div class="cartpanda-price-row" style="border-bottom:none; padding-bottom:.5rem;">
+                  <div class="cartpanda-price-info-text">Estimated taxes</div>
+                  <div class="popup-estimated-tax">$0.00</div>
+                </div>
+                <div class="cartpanda-price-row" style="border-bottom:none;">
+                  <div class="cartpanda-price-info-text">Previous spending</div>
+                  <div class="popup-total-order-amount">$0.14</div>
+                </div>
+                <div style="display:flex; align-items:center; margin-top:.5rem;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256">
+                    <g fill="#5f6a77" stroke="#5f6a77" stroke-width="3">
+                      <g transform="scale(2,2)">
+                        <path d="M64,6c-32,0-58,26-58,58c0,32,26,58,58,58c32,0,58-26,58-58c0-32-26-58-58-58zM64,12c28.7,0,52,23.3,52,52c0,28.7-23.3,52-52,52c-28.7,0-52-23.3-52-52c0-28.7,23.3-52,52-52zM64,59c-5,0-9,4-9,9v24c0,5,4,9,9,9c5,0,9-4,9-9v-24c0-5-4-9-9-9z"/>
+                      </g>
+                    </g>
+                  </svg>
+                  <small class="cartpanda-price-info-text font-size-sm font-normal">You will be charged immediately</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <footer class="cartpanda-modal-footer">
+            <button type="button" class="cartpanda-secondary-button">No, thanks</button>
+            <button type="submit" class="cartpanda-primary-button">Yes, proceed with payment</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script para exibir o modal customizado sem ocultar o original -->
   <script>
-    // Exibe o modal customizado quando o CartPanda abre o original
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver(() => {
       const orig = document.getElementById('cartpanda-modal-container');
       if (orig && orig.style.display !== 'none') {
         document.getElementById('custom-modal-container').style.display = 'block';
@@ -314,13 +215,11 @@
     });
     observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
 
-    // Fecha o custom modal
     document.addEventListener('click', (e) => {
-      if (e.target.matches('.custom-modal-close') || e.target.matches('.custom-secondary-button')) {
+      if (e.target.matches('.cartpanda-modal-close') || e.target.matches('.cartpanda-secondary-button')) {
         document.getElementById('custom-modal-container').style.display = 'none';
       }
     });
   </script>
-
 </body>
 </html>
