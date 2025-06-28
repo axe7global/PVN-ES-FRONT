@@ -32,7 +32,9 @@
       border-radius: 8px;
       font-size: 1.2em;
       cursor: pointer;
-      margin: 30px 0;
+      margin: 15px 10px;
+      display: block;
+      text-decoration: none;
     }
     .section {
       padding: 20px;
@@ -105,25 +107,28 @@
     <p>That really surprised us…</p>
     <p>It’s a fast, safe, and 100% natural method.</p>
     <p>It doesn’t put your heart or health at risk…</p>
-    <p>Although this program is worth over $150, I chose to make it affordable for Titan Boost students because I know how much difference it will make for you.</p>
+    <p>Although this program is worth over $150, I chose to make it affordable for Titan Boost students porque eu sei o quanto fará diferença para você.</p>
     <p>So, you won’t have to pay $150 to access this manual. Not even $100, which would still be fair today.</p>
     <p><strong class="highlight">And here on this page you can access this manual and add it as a combo to your package for only:</strong></p>
     <p class="highlight emoji center" style="font-size: 1.8em;"><strong>$47</strong></p>
     <p>This price is only valid right now; if you want to buy the same program later, you’ll have to pay the normal price, which will be around $150 to $200…</p>
     <p>And I know you think you might not need it now, but in the future I guarantee you will…</p>
     <p>When you become known as “The guy who makes NO ONE orgasm,” feeling ashamed of having a hard-on but a ruined reputation, you’ll regret not taking this opportunity to buy it for $47 and you’ll only find it for over $150 on the internet… (IF YOU CAN FIND IT)</p>
-    <p>If you close this site, you’ll lose this opportunity forever, and rest assured you’re still protected by my 180-day unconditional guarantee. If you don’t like this program, I suggest you request a refund because I don’t deserve your money…</p>
-    <p>I’m doing this because I’m committed to your transformation, so I don’t mind taking all the risks.</p>
+    <p>If you close this site, you’ll lose this opportunity forever, and rest assured you’re still protected by my 180-day unconditional guarantee. If you don’t like this program, I suggest you request a refund porque eu não mereço o seu dinheiro…</p>
+    <p>I’m doing this porque estou comprometido com a sua transformação, então não me importo de assumir todos os riscos.</p>
     <p>Now remember that once you leave this page, this opportunity is gone forever.</p>
     <p>You won’t find this material anywhere else with this offer; it’s only available to men who show they are truly determined…</p>
     <p>So, by passing up this opportunity, you’re basically giving it up forever.</p>
-    <p>See, you already have access to Titan Boost, and once you have a hard-on, your fame among women can be terrible, which I definitely know is not something you want.</p>
+    <p>See, you already have access to Titan Boost, and once you have a hard-on, your fame among women can ser terrível, which eu definitivamente sei que não é algo que você deseja.</p>
     <p>To add this new program to your package along with Titan Boost, just click the green button below and you’ll get access to “MP5”…</p>
   </div>
 
   <div class="center">
-    <a href="https://go.perfectpay.com.br/PPU38CPRBQ0?upsell=true" class="cta-button">
-      YES, I WANT TO ADD MP5 TO MY PACKAGE!
+    <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/q7YEdPEVMp?accepted=yes" class="cta-button">
+      BUY NOW
+    </a>
+    <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/q7YEdPEVMp?accepted=no" class="cta-button">
+      NO, THANKS
     </a>
   </div>
 
@@ -131,5 +136,108 @@
     <p>See you on the other side,<br>
     Dr. David Cain</p>
   </div>
+
+  <script>
+    // Estilos para esconder o modal do CartPanda
+    const style = document.createElement('style');
+    style.innerHTML = `
+      #cartpandaModal,
+      .cartpanda-modal,
+      .cartpanda-modal.fade,
+      .cartpanda-modal.show {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      .topbar-section {
+        margin-top: 2500px;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Esconde e mostra o .featured-product após 5 segundos
+    $('.featured-product').hide();
+    setTimeout(() => {
+      $('.featured-product').show();
+    }, 5000);
+
+    // Texto do botão de upsell que queremos interceptar
+    const BOTAO_TEXTO = "BUY NOW";
+
+    // Função auxiliar para encontrar o botão pelo texto exato
+    function findButtonByText(textToFind) {
+      const allButtons = document.querySelectorAll('button');
+      textToFind = textToFind.trim().toLowerCase();
+
+      for (let btn of allButtons) {
+        const btnText = btn.textContent.trim().toLowerCase();
+        if (btnText === textToFind) {
+          return btn;
+        }
+      }
+      return null;
+    }
+
+    // Quando o DOM estiver pronto, começa a procurar o botão
+    document.addEventListener('DOMContentLoaded', () => {
+      const pollInterval = setInterval(() => {
+        // Garante que o modal continue escondido
+        const cartpandaModal = document.getElementById('cartpandaModal');
+        if (cartpandaModal) {
+          cartpandaModal.style.display = 'none';
+        }
+
+        // Procura o botão de upsell
+        const upsellButton = findButtonByText(BOTAO_TEXTO);
+        if (upsellButton) {
+          clearInterval(pollInterval);
+
+          // Remove atributos que disparam o modal
+          upsellButton.removeAttribute('data-toggle');
+          upsellButton.removeAttribute('data-target');
+          upsellButton.removeAttribute('onclick');
+
+          // Clona o botão para tirar qualquer event binding original
+          const newButton = upsellButton.cloneNode(true);
+          upsellButton.parentNode.replaceChild(newButton, upsellButton);
+
+          // Associa o clique customizado
+          newButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (cartpandaModal) {
+              cartpandaModal.style.display = 'none';
+            }
+
+            const quantityInput = document.getElementById('cartpanda-product-quantity');
+            if (quantityInput) {
+              quantityInput.value = 1;
+            }
+
+            const confirmBtn = document.getElementById('cartpanda-payment-confirmation');
+            if (confirmBtn) {
+              confirmBtn.click();
+            } else {
+              console.warn('Não encontrei #cartpanda-payment-confirmation para confirmar o upsell.');
+            }
+          });
+
+          // Tenta clicar assim que o botão ficar visível no layout
+          const tryClick = setInterval(() => {
+            const isVisible = !!(newButton.offsetWidth || newButton.offsetHeight || newButton.getClientRects().length);
+            if (isVisible) {
+              clearInterval(tryClick);
+              try {
+                newButton.click();
+              } catch (error) {
+                console.warn('Erro ao tentar clicar no botão CONTINUA:', error);
+              }
+            }
+          }, 300);
+        }
+      }, 500);
+    });
+  </script>
 </body>
 </html>
