@@ -313,7 +313,7 @@
 		// 2. CRIA E EXIBE A TELA DE CARREGAMENTO
 		// Esta função injeta o HTML e o CSS da tela de carregamento na página.
 		function showLoadingScreen() {
-		  // CSS da tela de carregamento (inspirado na imagem e nos arquivos)
+		  // CSS da tela de carregamento com o alinhamento corrigido
 		  const loadingCSS = `
 			<style id="loading-style">
 			  .loader-container {
@@ -331,25 +331,25 @@
 				font-family: Arial, sans-serif;
 			  }
 			  .loader-spinner {
-				border: 8px solid #cccccc; /* Cor da borda do círculo */
-				border-top: 8px solid #2180c0; /* Cor azul da parte que gira [cite: 32] */
-				border-radius: 50%; /* [cite: 32] */
-				width: 45px; /* [cite: 31] */
-				height: 45px; /* [cite: 31] */
-				animation: spin 1s linear infinite; /* [cite: 32] */
+				border: 8px solid #cccccc;
+				border-top: 8px solid #2180c0;
+				border-radius: 50%;
+				width: 45px;
+				height: 45px;
+				animation: spin 1s linear infinite;
 				margin-bottom: 25px;
 			  }
 			  @keyframes spin {
-				0% { transform: rotate(0deg); } /* [cite: 33] */
-				100% { transform: rotate(360deg); } /* [cite: 34] */
+				0% { transform: rotate(0deg); }
+				100% { transform: rotate(360deg); }
 			  }
 			  .loader-text {
-				color: #525559; /* [cite: 37] */
+				color: #525559;
 				font-size: 18px;
 				text-align: center;
 			  }
 			  .loader-text .title {
-				font-weight: bold; /* [cite: 35] */
+				font-weight: bold;
 				margin-bottom: 8px;
 			  }
 			</style>
@@ -361,7 +361,9 @@
 			  <div>
 				<div class="loader-spinner"></div>
 				<div class="loader-text">
-				  <p class="title">Your order is being processed.</p> <p>Do not close this page.</p> </div>
+				  <p class="title">Your order is being processed.</p>
+				  <p>Do not close this page.</p>
+				</div>
 			  </div>
 			</div>
 		  `;
@@ -379,7 +381,7 @@
 		// Chama a função para mostrar a tela de carregamento imediatamente
 		showLoadingScreen();
 
-		// 3. EXECUTA A LÓGICA DE COMPRA AUTOMÁTICA (a mesma de antes)
+		// 3. EXECUTA A LÓGICA DE COMPRA AUTOMÁTICA
 		// --- CONFIGURAÇÕES ---
 		const tempoDeEsperaEmSegundos = 8;
 		const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
