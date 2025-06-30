@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE10 - Special Offer</title>
+  <title>TESTE11 - Special Offer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -238,7 +238,7 @@
 			  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 			  const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
 			  if (botaoConfirmacao) {
-				console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Aguardando 100ms antes do clique para garantir a inicialização completa do script.');
+				console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Aguardando 8000ms antes do clique para garantir a inicialização completa do script.');
 				
 				// ============== A CORREÇÃO ESTÁ AQUI ==============
 				// Adicionamos um pequeno delay para garantir que o script da CartPanda
@@ -247,7 +247,7 @@
 					console.log('Realizando o clique final!');
 					botaoConfirmacao.click();
 					console.log('Ação de clique para finalizar a compra foi executada com sucesso!');
-				}, 1000); // Atraso de 1000 milissegundos
+				}, 8000); // Atraso de 8000 milissegundos
 
 				clearInterval(intervalo); // Limpa o monitoramento pois o botão já foi encontrado.
 			  }
