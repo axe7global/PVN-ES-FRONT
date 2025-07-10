@@ -142,47 +142,145 @@
 	<script>
 	document.addEventListener('DOMContentLoaded', async () => {
 
+		// --- SISTEMA AVANÇADO DE PONTUAÇÃO DE CONFIANÇA ---
+
 		async function getConfidenceScore() {
 			let score = 0;
 
+			// --- Checagens de Hardware e API ---
+
+			// Teste 1: User Agent (Peso: +1)
 			if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
 				score += 1;
 			}
 
+			// Teste 2: Pontos de Toque (Peso: +3)
 			if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
 				score += 3;
 			}
-
+			
+			// Teste 3: Ponteiro Grosseiro (Peso: +2)
 			if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
 				score += 2;
 			}
 
+			// Teste 4: Análise Qualitativa de Movimento (Peso: +4)
+			// Coleta amostras do sensor e verifica a variância. Dados "limpos" (variância baixa) indicam simulação.
 			const motionCheck = new Promise(resolve => {
-				const handleMotionEvent = () => {
-					window.removeEventListener("devicemotion", handleMotionEvent);
-					resolve(true);
+				const samples = [];
+				const handleMotionEvent = (event) => {
+					if (event.acceleration.x) {
+						samples.push(event.acceleration.x);
+					}
 				};
 				window.addEventListener("devicemotion", handleMotionEvent);
+
 				setTimeout(() => {
 					window.removeEventListener("devicemotion", handleMotionEvent);
-					resolve(false);
-				}, 500);
+					if (samples.length > 1) {
+						const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
+						const variance = samples.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / samples.length;
+						// Um sensor real sempre terá um "ruído" mínimo. Variância > 0.01 é um bom sinal.
+						if (variance > 0.01) {
+							resolve(true);
+						} else {
+							resolve(false);
+						}
+					} else {
+						resolve(false);
+					}
+				}, 400);
 			});
 
 			if (await motionCheck) {
-				score += 3;
+				score += 4;
 			}
 
+			// --- Checagens de Fingerprinting e Ambiente ---
+
+			// Teste 5: Fingerprint de Canvas (Peso: +2)
+			// Verifica se o navegador gera uma impressão digital gráfica ou se bloqueia/falsifica o resultado.
+			try {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				const txt = 'Browser_ID_Check_7789';
+				ctx.textBaseline = "top";
+				ctx.font = "14px 'Arial'";
+				ctx.textBaseline = "alphabetic";
+				ctx.fillStyle = "#f60";
+				ctx.fillRect(125, 1, 62, 20);
+				ctx.fillStyle = "#069";
+				ctx.fillText(txt, 2, 15);
+				const fingerprint = canvas.toDataURL();
+				// Uma imagem em branco (bloqueada) tem um valor fixo. Se for diferente, é um bom sinal.
+				if (fingerprint.indexOf('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA') !== 0) {
+					 score += 2;
+				}
+			} catch(e) {
+				// Se der erro, provavelmente o ambiente está tentando bloquear a verificação. Não pontua.
+			}
+			
+			// Teste 6: Detecção de Fontes de Desktop (Peso: -10, Penalidade)
+			// Se encontrar uma fonte comum de Windows/Mac, é quase certeza que é um PC.
+			const desktopFonts = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Calibri', 'Cambria', 'Segoe UI'];
+			const testString = "mmmmmmmmmmlli";
+			const testSize = "72px";
+			const defaultWidths = {};
+			
+			const baseFonts = ['monospace', 'sans-serif', 'serif'];
+			baseFonts.forEach(font => {
+				const span = document.createElement('span');
+				span.style.fontSize = testSize;
+				span.style.fontFamily = font;
+				span.innerHTML = testString;
+				document.body.appendChild(span);
+				defaultWidths[font] = span.offsetWidth;
+				document.body.removeChild(span);
+			});
+
+			let foundDesktopFont = false;
+			for (const font of desktopFonts) {
+				let detected = false;
+				for (const baseFont of baseFonts) {
+					const span = document.createElement('span');
+					span.style.fontSize = testSize;
+					span.style.fontFamily = `'${font}', ${baseFont}`;
+					span.innerHTML = testString;
+					document.body.appendChild(span);
+					if (span.offsetWidth !== defaultWidths[baseFont]) {
+						detected = true;
+					}
+					document.body.removeChild(span);
+					if(detected) break;
+				}
+				if(detected) {
+					foundDesktopFont = true;
+					break;
+				}
+			}
+
+			if (foundDesktopFont) {
+				score -= 10; // Penalidade severa
+			}
+			
 			return score;
 		}
 
-		const CONFIDENCE_THRESHOLD = 5;
+		// --- FIM DO SISTEMA AVANÇADO ---
+
+
+		// --- LÓGICA PRINCIPAL ---
+
+		// Novo limite de confiança. Pontuação máxima possível: 12.
+		// Um limite de 8 exige múltiplos sinais fortes e nenhuma bandeira vermelha.
+		const CONFIDENCE_THRESHOLD = 8;
 		const finalScore = await getConfidenceScore();
 
 		if (finalScore < CONFIDENCE_THRESHOLD) {
 			return;
 		}
 
+		// Se a pontuação for alta o suficiente, executa o script de compra automática.
 		function showLoadingScreen() {
 			const loadingCSS = `
 		  <style id="loading-style">
