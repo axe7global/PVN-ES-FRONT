@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>MP5</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f9f9f9;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    }
+    .top-menu {
+      background-color: red;
+      padding: 5px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9em;
+      color: white;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .page-wrapper {
+      padding: 10px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+    .highlight {
+      color: green;
+      font-weight: bold;
+    }
+    .section {
+      padding: 5px;
+    }
+    ul {
+      list-style-type: "✅ ";
+      padding-left: 20px;
+    }
+    .emoji {
+      font-size: 1.2em;
+    }
+    .center {
+      text-align: center;
+    }
+
+    .hotmart-wrapper {
+      position: relative;
+      display: inline-block;
+      margin: 30px 0;
+    }
+    .overlay-hide-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 280px;
+      background: white;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    p {
+      margin-bottom: 1.8em;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-menu">
+    STEP 2 OF 2
+  </div>
+
+  <div class="page-wrapper">
+    <div class="section">
+      <p class="center"><span class="warning">ATTENTION!</span></p>
+      <p>Do not refresh or close this page — this step is crucial!</p>
+      <p>I’m going to give you the instructions to access the app...</p>
+      <p>Once you access the app link, you’ll see a screen like this one:</p>
+      <div class="center">
+        <img src="img/img1-up2.png" alt="Image 1" style="max-width: 100%; height: auto;">
+      </div>
+      <p>At this stage, you just need to enter the email address you used for the purchase and click the button to log in.</p>
+      <p>After logging in, you’ll see a screen like this:</p>
+      <div class="center">
+        <img src="img/img2-up2.png" alt="Image 2" style="max-width: 100%; height: auto;">
+      </div>
+      <p>From there, simply follow the protocol step by step, exactly as shown inside the platform.</p>
+      <p>Below you will see a new button...</p>
+      <p>Click it to receive the access link to the protocol.</p>
+    </div>
+
+    <div class="hotmart-wrapper center">
+      <div class="overlay-hide-top"></div>
+
+      <div id="hotmart-sales-funnel"></div>
+      <script src="https://checkout.hotmart.com/lib/hotmart-checkout-elements.js"></script>
+      <script>
+        checkoutElements
+          .init('salesFunnel')
+          .mount('#hotmart-sales-funnel');
+      </script>
+    </div>
+
+    <div class="section">
+      <p>See you on the other side...</p>
+    </div>
+  </div>
+  
+</body>
+</html>
