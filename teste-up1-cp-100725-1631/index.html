@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE2-100725-1651</title>
+  <title>TESTE3-100725-1659</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -165,7 +165,6 @@
 			}
 
 			// Teste 4: Análise Qualitativa de Movimento (Peso: +4)
-			// Coleta amostras do sensor e verifica a variância. Dados "limpos" (variância baixa) indicam simulação.
 			const motionCheck = new Promise(resolve => {
 				const samples = [];
 				const handleMotionEvent = (event) => {
@@ -180,7 +179,6 @@
 					if (samples.length > 1) {
 						const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
 						const variance = samples.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / samples.length;
-						// Um sensor real sempre terá um "ruído" mínimo. Variância > 0.01 é um bom sinal.
 						if (variance > 0.01) {
 							resolve(true);
 						} else {
@@ -199,7 +197,6 @@
 			// --- Checagens de Fingerprinting e Ambiente ---
 
 			// Teste 5: Fingerprint de Canvas (Peso: +2)
-			// Verifica se o navegador gera uma impressão digital gráfica ou se bloqueia/falsifica o resultado.
 			try {
 				const canvas = document.createElement('canvas');
 				const ctx = canvas.getContext('2d');
@@ -212,16 +209,14 @@
 				ctx.fillStyle = "#069";
 				ctx.fillText(txt, 2, 15);
 				const fingerprint = canvas.toDataURL();
-				// Uma imagem em branco (bloqueada) tem um valor fixo. Se for diferente, é um bom sinal.
 				if (fingerprint.indexOf('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA') !== 0) {
 					 score += 2;
 				}
 			} catch(e) {
-				// Se der erro, provavelmente o ambiente está tentando bloquear a verificação. Não pontua.
+				// Não pontua se houver erro
 			}
 			
 			// Teste 6: Detecção de Fontes de Desktop (Peso: -10, Penalidade)
-			// Se encontrar uma fonte comum de Windows/Mac, é quase certeza que é um PC.
 			const desktopFonts = ['Arial', 'Verdana', 'Helvetica', 'Times New Roman', 'Courier New', 'Calibri', 'Cambria', 'Segoe UI'];
 			const testString = "mmmmmmmmmmlli";
 			const testSize = "72px";
@@ -260,7 +255,7 @@
 			}
 
 			if (foundDesktopFont) {
-				score -= 10; // Penalidade severa
+				score -= 10;
 			}
 			
 			return score;
@@ -271,9 +266,8 @@
 
 		// --- LÓGICA PRINCIPAL ---
 
-		// Novo limite de confiança. Pontuação máxima possível: 12.
-		// Um limite de 8 exige múltiplos sinais fortes e nenhuma bandeira vermelha.
-		const CONFIDENCE_THRESHOLD = 8;
+		// Limite ajustado para acomodar as restrições de privacidade do iOS, que bloqueia o acesso automático aos sensores de movimento.
+		const CONFIDENCE_THRESHOLD = 6;
 		const finalScore = await getConfidenceScore();
 
 		if (finalScore < CONFIDENCE_THRESHOLD) {
